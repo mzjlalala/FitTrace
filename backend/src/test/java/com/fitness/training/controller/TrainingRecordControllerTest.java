@@ -15,8 +15,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -235,5 +237,102 @@ class TrainingRecordControllerTest {
                         .header("Authorization", "Bearer " + bob))
                 .andExpect(jsonPath("$.code").value(404))
                 .andExpect(jsonPath("$.message").value("训练记录不存在"));
+    }
+
+    @Test
+    void update_replacesSetsEntirely() throws Exception {
+        String token = registerAndLogin(genUsername());
+        int actionId = firstActionId(token);
+        MvcResult created = mockMvc.perform(post("/api/training-records")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validBody(actionId, null)))
+                .andExpect(jsonPath("$.code").value(200)).andReturn();
+        int recordId = JsonPath.read(created.getResponse().getContentAsString(), "$.data.id");
+
+        // 更新为 1 组，日期改为昨天
+        String updateBody = "{\"trainingDate\":\"" + LocalDate.now().minusDays(1)
+                + "\",\"durationMinutes\":45,\"feel\":\"TIRED\","
+                + "\"sets\":[{\"actionId\":" + actionId + ",\"weightKg\":80,\"reps\":5,\"doneFlag\":true}]}";
+        mockMvc.perform(put("/api/training-records/" + recordId)
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateBody))
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.trainingDate").value(LocalDate.now().minusDays(1).toString()))
+                .andExpect(jsonPath("$.data.durationMinutes").value(45))
+                .andExpect(jsonPath("$.data.feel").value("TIRED"))
+                .andExpect(jsonPath("$.data.sets.length()").value(1))
+                .andExpect(jsonPath("$.data.sets[0].weightKg").value(80));
+    }
+
+    @Test
+    void update_otherUsersRecord_returns404() throws Exception {
+        String alice = registerAndLogin(genUsername());
+        int actionId = firstActionId(alice);
+        MvcResult created = mockMvc.perform(post("/api/training-records")
+                        .header("Authorization", "Bearer " + alice)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validBody(actionId, null)))
+                .andExpect(jsonPath("$.code").value(200)).andReturn();
+        int recordId = JsonPath.read(created.getResponse().getContentAsString(), "$.data.id");
+
+        String bob = registerAndLogin(genUsername());
+        mockMvc.perform(put("/api/training-records/" + recordId)
+                        .header("Authorization", "Bearer " + bob)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"trainingDate\":\"" + LocalDate.now()
+                                + "\",\"sets\":[{\"actionId\":" + actionId + "}]}"))
+                .andExpect(jsonPath("$.code").value(404))
+                .andExpect(jsonPath("$.message").value("训练记录不存在"));
+    }
+
+    @Test
+    void delete_removesRecordAndSets() throws Exception {
+        String token = registerAndLogin(genUsername());
+        int actionId = firstActionId(token);
+        MvcResult created = mockMvc.perform(post("/api/training-records")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validBody(actionId, null)))
+                .andExpect(jsonPath("$.code").value(200)).andReturn();
+        int recordId = JsonPath.read(created.getResponse().getContentAsString(), "$.data.id");
+
+        mockMvc.perform(delete("/api/training-records/" + recordId)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(jsonPath("$.code").value(200));
+
+        mockMvc.perform(get("/api/training-records/" + recordId)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(jsonPath("$.code").value(404));
+        mockMvc.perform(get("/api/training-records")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(jsonPath("$.data.total").value(0));
+    }
+
+    @Test
+    void delete_otherUsersRecord_returns404() throws Exception {
+        String alice = registerAndLogin(genUsername());
+        int actionId = firstActionId(alice);
+        MvcResult created = mockMvc.perform(post("/api/training-records")
+                        .header("Authorization", "Bearer " + alice)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(validBody(actionId, null)))
+                .andExpect(jsonPath("$.code").value(200)).andReturn();
+        int recordId = JsonPath.read(created.getResponse().getContentAsString(), "$.data.id");
+
+        String bob = registerAndLogin(genUsername());
+        mockMvc.perform(delete("/api/training-records/" + recordId)
+                        .header("Authorization", "Bearer " + bob))
+                .andExpect(jsonPath("$.code").value(404));
+    }
+
+    @Test
+    void updateDelete_withoutToken_returnsHttp401() throws Exception {
+        mockMvc.perform(put("/api/training-records/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"trainingDate\":\"2026-08-07\",\"sets\":[{\"actionId\":1}]}"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(delete("/api/training-records/1")).andExpect(status().isUnauthorized());
     }
 }

@@ -174,6 +174,37 @@ public class TrainingRecordService {
     }
 
     /**
+     * 更新训练记录（整体替换）：校验归属与关联引用，先删旧组数据，再更新记录字段并插入新组数据
+     */
+    @Transactional
+    public TrainingRecordDetailVO update(Long userId, Long id, TrainingRecordCreateRequest req) {
+        TrainingRecord record = requireOwned(userId, id);
+        validateRefs(req);
+        trainingRecordSetMapper.delete(Wrappers.<TrainingRecordSet>lambdaQuery()
+                .eq(TrainingRecordSet::getRecordId, id));
+        record.setPlanId(req.getPlanId());
+        record.setPlanDayId(req.getPlanDayId());
+        record.setTrainingDate(req.getTrainingDate());
+        record.setDurationMinutes(req.getDurationMinutes());
+        record.setFeel(req.getFeel());
+        record.setNote(req.getNote());
+        trainingRecordMapper.updateById(record);
+        insertSets(id, req.getSets());
+        return buildDetail(id);
+    }
+
+    /**
+     * 删除训练记录：校验归属，先删组数据再删记录（外键禁止直接删有子集的记录）
+     */
+    @Transactional
+    public void delete(Long userId, Long id) {
+        requireOwned(userId, id);
+        trainingRecordSetMapper.delete(Wrappers.<TrainingRecordSet>lambdaQuery()
+                .eq(TrainingRecordSet::getRecordId, id));
+        trainingRecordMapper.deleteById(id);
+    }
+
+    /**
      * 按 id 校验记录归属：不存在或非本人抛 404
      */
     private TrainingRecord requireOwned(Long userId, Long id) {

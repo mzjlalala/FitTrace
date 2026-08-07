@@ -83,6 +83,21 @@ class UserControllerTest {
     }
 
     @Test
+    void updateProfile_updatesAvatar() throws Exception {
+        String token = registerAndLogin("avatar1");
+        String avatarUrl = "https://fit-test.oss-cn-hangzhou.aliyuncs.com/fitness/20260807/abc.png";
+        mockMvc.perform(put("/api/user/profile")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"avatar\":\"" + avatarUrl + "\"}"))
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.avatar").value(avatarUrl));
+
+        mockMvc.perform(get("/api/user/profile").header("Authorization", "Bearer " + token))
+                .andExpect(jsonPath("$.data.avatar").value(avatarUrl));
+    }
+
+    @Test
     void getProfile_withoutToken_returns401() throws Exception {
         mockMvc.perform(get("/api/user/profile"))
                 .andExpect(status().isUnauthorized())

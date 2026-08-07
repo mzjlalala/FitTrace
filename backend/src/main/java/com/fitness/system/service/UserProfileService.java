@@ -41,6 +41,10 @@ public class UserProfileService {
             user.setNickname(req.getNickname());
             sysUserMapper.updateById(user);
         }
+        if (req.getAvatar() != null && !req.getAvatar().isBlank()) {
+            user.setAvatar(req.getAvatar());
+            sysUserMapper.updateById(user);
+        }
         UserProfile profile = getOrCreateProfile(userId);
         profile.setGender(req.getGender());
         profile.setBirthDate(req.getBirthDate());

@@ -21,6 +21,10 @@ public class UserProfileUpdateRequest {
     @Size(max = 30, message = "昵称最长 30 字")
     private String nickname;
 
+    /** 头像 URL（OSS 上传后返回的地址，非空才更新） */
+    @Size(max = 255, message = "头像地址最长 255 字")
+    private String avatar;
+
     /** 性别（MALE=男 / FEMALE=女） */
     @Pattern(regexp = "^(MALE|FEMALE)$", message = "性别仅支持 MALE / FEMALE")
     private String gender;

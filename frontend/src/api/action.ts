@@ -42,6 +42,18 @@ export interface ActionListParams {
   keyword?: string
 }
 
+/** 肌群枚举 → 中文名（后台管理与详情页共用） */
+export const MUSCLE_LABEL: Record<string, string> = {
+  CHEST: '胸部',
+  BACK: '背部',
+  LEGS: '腿部',
+  SHOULDERS: '肩部',
+  BICEPS: '二头',
+  TRICEPS: '三头',
+  CORE: '核心',
+  CARDIO: '有氧',
+}
+
 export const apiGetCategories = () => http.get<ActionCategory[]>('/actions/categories')
 export const apiListActions = (params: ActionListParams) =>
   http.get<PageResult<ActionListItem>>('/actions', { params })

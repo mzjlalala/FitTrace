@@ -8,7 +8,7 @@ import {
   apiAdminUpdateAction,
   type AdminAction,
 } from '@/api/admin'
-import { apiGetCategories, type ActionCategory } from '@/api/action'
+import { apiGetCategories, MUSCLE_LABEL, type ActionCategory } from '@/api/action'
 
 const records = ref<AdminAction[]>([])
 const total = ref(0)
@@ -26,16 +26,6 @@ const DIFFICULTY_LABEL: Record<string, string> = {
   BEGINNER: '初级',
   INTERMEDIATE: '中级',
   ADVANCED: '高级',
-}
-
-const MUSCLE_LABEL: Record<string, string> = {
-  CHEST: '胸部',
-  BACK: '背部',
-  LEGS: '腿部',
-  SHOULDERS: '肩部',
-  ARMS: '手臂',
-  CORE: '核心',
-  CARDIO: '有氧',
 }
 
 interface StepRow {

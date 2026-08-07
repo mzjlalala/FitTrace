@@ -62,4 +62,24 @@ class ActionMapperTest {
         assertThat(pushUp.getCautions()).isNotEmpty();
         assertThat(pushUp.getStatus()).isEqualTo(1);
     }
+
+    @Test
+    void armActions_refinedToBicepsAndTriceps() {
+        // V7 细分：弯举类 → BICEPS，臂屈伸/下压类 → TRICEPS
+        assertThat(actionMapper.selectOne(
+                Wrappers.<Action>lambdaQuery().eq(Action::getName, "杠铃弯举")).getMuscleGroup())
+                .isEqualTo("BICEPS");
+        assertThat(actionMapper.selectOne(
+                Wrappers.<Action>lambdaQuery().eq(Action::getName, "哑铃锤式弯举")).getMuscleGroup())
+                .isEqualTo("BICEPS");
+        assertThat(actionMapper.selectOne(
+                Wrappers.<Action>lambdaQuery().eq(Action::getName, "绳索下压")).getMuscleGroup())
+                .isEqualTo("TRICEPS");
+        assertThat(actionMapper.selectOne(
+                Wrappers.<Action>lambdaQuery().eq(Action::getName, "仰卧杠铃臂屈伸")).getMuscleGroup())
+                .isEqualTo("TRICEPS");
+        // 不应残留未细分的 ARMS 肌群
+        assertThat(actionMapper.selectCount(
+                Wrappers.<Action>lambdaQuery().eq(Action::getMuscleGroup, "ARMS"))).isZero();
+    }
 }

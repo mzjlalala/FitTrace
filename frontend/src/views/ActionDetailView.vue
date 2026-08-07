@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { apiGetAction, type ActionDetail } from '@/api/action'
+import { apiGetAction, MUSCLE_LABEL, type ActionDetail } from '@/api/action'
 
 const route = useRoute()
 const router = useRouter()
@@ -35,7 +35,7 @@ onMounted(async () => {
         <el-tag>{{ detail.categoryName }}</el-tag>
         <el-tag type="warning">{{ DIFFICULTY_LABEL[detail.difficulty] }}</el-tag>
         <el-tag type="info">{{ detail.equipment }}</el-tag>
-        <el-tag type="success">{{ detail.muscleGroup }}</el-tag>
+        <el-tag type="success">{{ MUSCLE_LABEL[detail.muscleGroup] || detail.muscleGroup }}</el-tag>
       </div>
       <el-alert
         v-if="detail.description"

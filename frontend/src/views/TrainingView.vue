@@ -26,6 +26,27 @@ function fmt(d: Date): string {
 const todayStr = fmt(new Date())
 const dateRange = ref<[string, string]>([fmt(new Date(new Date().getFullYear(), new Date().getMonth(), 1)), todayStr])
 
+/** 常用时间快捷选项（天数为往前推的天数） */
+const QUICK_RANGES = [
+  { label: '近7天', days: 6 },
+  { label: '近30天', days: 29 },
+  { label: '本月', days: null },
+]
+const quickRange = ref('本月')
+
+function applyQuickRange(label: string) {
+  const now = new Date()
+  if (label === '本月') {
+    dateRange.value = [fmt(new Date(now.getFullYear(), now.getMonth(), 1)), fmt(now)]
+  } else {
+    const days = QUICK_RANGES.find((q) => q.label === label)?.days ?? 0
+    dateRange.value = [fmt(new Date(now.getTime() - days * 86400000)), fmt(now)]
+  }
+  // 直接刷新，保留快捷项高亮（onRangeChange 会清空高亮，仅手动选日期时调用）
+  page.value = 1
+  loadRecords()
+}
+
 const dialogVisible = ref(false)
 const drawerVisible = ref(false)
 const submitting = ref(false)
@@ -85,6 +106,8 @@ async function loadRecords() {
 
 function onRangeChange() {
   page.value = 1
+  // 手动选择日期范围时取消快捷项高亮
+  quickRange.value = ''
   loadRecords()
 }
 
@@ -197,6 +220,11 @@ onMounted(async () => {
     <div class="toolbar">
       <h2>训练记录</h2>
       <div class="toolbar-right">
+        <el-radio-group v-model="quickRange" @change="applyQuickRange">
+          <el-radio-button v-for="q in QUICK_RANGES" :key="q.label" :label="q.label" :value="q.label">
+            {{ q.label }}
+          </el-radio-button>
+        </el-radio-group>
         <el-date-picker
           v-model="dateRange"
           type="daterange"

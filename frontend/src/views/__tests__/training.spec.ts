@@ -105,6 +105,26 @@ describe('TrainingView', () => {
     )
   })
 
+  it('applies quick range 近30天 when clicking the shortcut', async () => {
+    const wrapper = mount(TrainingView, { global: { plugins: [ElementPlus] } })
+    await flushPromises()
+
+    const radio30 = wrapper.findAll('.el-radio-button').find((r) => r.text().includes('近30天'))!
+    await radio30.find('input').setValue(true)
+    await radio30.find('input').trigger('change')
+    await flushPromises()
+
+    const now = new Date()
+    const fmt = (d: Date) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    expect(vi.mocked(apiListTrainingRecords)).toHaveBeenLastCalledWith(
+      1,
+      10,
+      fmt(new Date(now.getTime() - 29 * 86400000)),
+      fmt(now),
+    )
+  })
+
   it('opens create dialog when clicking 记录训练', async () => {
     const wrapper = mount(TrainingView, { global: { plugins: [ElementPlus] } })
     await flushPromises()

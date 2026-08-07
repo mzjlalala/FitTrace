@@ -13,9 +13,12 @@ function onLogout() {
 
 <template>
   <el-container class="layout">
-    <el-aside width="200px">
-      <div class="logo">FitTrace</div>
-      <el-menu :default-active="$route.path" router>
+    <el-aside width="200px" class="aside">
+      <div class="logo">
+        <span class="logo-badge">💪</span>
+        <span class="logo-text">FitTrace</span>
+      </div>
+      <el-menu :default-active="$route.path" router class="side-menu">
         <el-menu-item index="/">首页</el-menu-item>
         <el-menu-item index="/actions">动作库</el-menu-item>
         <el-menu-item index="/plans">计划中心</el-menu-item>
@@ -54,19 +57,42 @@ function onLogout() {
 .layout {
   height: 100vh;
 }
+.aside {
+  background: #fff;
+  border-right: 1px solid #eef1f0;
+}
 .logo {
   height: 60px;
-  line-height: 60px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.logo-badge {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #10b981, #22d3ee);
+}
+.logo-text {
   font-weight: 700;
-  font-size: 20px;
-  color: #409eff;
+  font-size: 19px;
+  color: #0d9467;
+}
+.side-menu {
+  border-right: none;
 }
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid #ebeef5;
+  background: #fff;
+  border-bottom: 1px solid #eef1f0;
+  box-shadow: 0 1px 6px rgba(16, 185, 129, 0.06);
 }
 .header-right {
   display: flex;
@@ -78,6 +104,6 @@ function onLogout() {
   font-size: 14px;
 }
 .avatar-fallback {
-  background: #409eff;
+  background: #10b981;
 }
 </style>

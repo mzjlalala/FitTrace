@@ -34,7 +34,10 @@ async function onSubmit() {
 <template>
   <div class="auth-page">
     <el-card class="auth-card">
-      <h2 class="title">FitTrace 登录</h2>
+      <div class="brand">
+        <div class="brand-logo">💪</div>
+        <h2 class="title">欢迎回来</h2>
+      </div>
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top" @keyup.enter="onSubmit">
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" placeholder="用户名" />
@@ -55,26 +58,69 @@ async function onSubmit() {
 
 <style scoped>
 .auth-page {
-  height: 100vh;
+  position: relative;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f5f7fa;
+  background: linear-gradient(135deg, #0d9467 0%, #10b981 50%, #22d3ee 100%);
+  overflow: hidden;
+}
+.auth-page::before,
+.auth-page::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+}
+.auth-page::before {
+  width: 320px;
+  height: 320px;
+  left: -100px;
+  top: -100px;
+}
+.auth-page::after {
+  width: 220px;
+  height: 220px;
+  right: -60px;
+  bottom: -60px;
 }
 .auth-card {
-  width: 380px;
+  position: relative;
+  width: 400px;
+  border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.brand-logo {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #10b981, #22d3ee);
 }
 .title {
-  text-align: center;
-  margin: 0 0 24px;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
 }
 .submit {
   width: 100%;
+  margin-top: 8px;
 }
 .foot {
   margin-top: 16px;
   text-align: center;
   font-size: 13px;
-  color: #909399;
+  color: #6b7280;
 }
 </style>

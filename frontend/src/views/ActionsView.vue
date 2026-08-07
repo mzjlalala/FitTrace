@@ -14,7 +14,7 @@ const categories = ref<ActionCategory[]>([])
 const records = ref<ActionListItem[]>([])
 const total = ref(0)
 const page = ref(1)
-const size = 12
+const size = ref(10)
 const activeCategory = ref<number | undefined>(undefined)
 const difficulty = ref<string | undefined>(undefined)
 const keyword = ref('')
@@ -36,7 +36,7 @@ async function loadActions() {
   try {
     const res = await apiListActions({
       page: page.value,
-      size,
+      size: size.value,
       categoryId: activeCategory.value,
       difficulty: difficulty.value,
       keyword: keyword.value || undefined,
@@ -137,8 +137,10 @@ onMounted(() => {
         v-if="total > size"
         v-model:current-page="page"
         :page-size="size"
+        :page-sizes="[10, 20, 50]"
         :total="total"
-        layout="prev, pager, next"
+        layout="total, sizes, prev, pager, next"
+        @size-change="(s: number) => { size = s; page = 1; loadActions() }"
         @current-change="loadActions"
       />
     </div>

@@ -14,7 +14,7 @@ import { apiListActions, type ActionListItem } from '@/api/action'
 const records = ref<AdminPlan[]>([])
 const total = ref(0)
 const page = ref(1)
-const size = 10
+const size = ref(10)
 const loading = ref(false)
 const keyword = ref('')
 
@@ -91,7 +91,7 @@ function addDay() {
 async function load() {
   loading.value = true
   try {
-    const res = await apiAdminListPlans({ page: page.value, size, keyword: keyword.value || undefined })
+    const res = await apiAdminListPlans({ page: page.value, size: size.value, keyword: keyword.value || undefined })
     records.value = res.data.records
     total.value = res.data.total
   } finally {
@@ -272,10 +272,12 @@ onMounted(async () => {
     <el-pagination
       v-if="total > size"
       class="pager"
-      layout="prev, pager, next, total"
+      layout="total, sizes, prev, pager, next"
       :total="total"
       :page-size="size"
+      :page-sizes="[10, 20, 50]"
       :current-page="page"
+      @size-change="(s: number) => { size = s; page = 1; load() }"
       @current-change="(p: number) => { page = p; load() }"
     />
 

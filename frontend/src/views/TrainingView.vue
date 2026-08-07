@@ -16,7 +16,7 @@ import { apiListActions, type ActionListItem } from '@/api/action'
 const records = ref<TrainingRecordVO[]>([])
 const total = ref(0)
 const page = ref(1)
-const size = 10
+const size = ref(10)
 const loading = ref(false)
 
 const dialogVisible = ref(false)
@@ -52,7 +52,7 @@ const dialogTitle = computed(() => (editingId.value ? '编辑训练记录' : '�
 async function loadRecords() {
   loading.value = true
   try {
-    const res = await apiListTrainingRecords(page.value, size)
+    const res = await apiListTrainingRecords(page.value, size.value)
     records.value = res.data.records
     total.value = res.data.total
   } catch {
@@ -197,10 +197,12 @@ onMounted(async () => {
     <el-pagination
       v-if="total > size"
       class="pager"
-      layout="prev, pager, next, total"
+      layout="total, sizes, prev, pager, next"
       :total="total"
       :page-size="size"
+      :page-sizes="[10, 20, 50]"
       :current-page="page"
+      @size-change="(s: number) => { size = s; page = 1; loadRecords() }"
       @current-change="(p: number) => { page = p; loadRecords() }"
     />
 

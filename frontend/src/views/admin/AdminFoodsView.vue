@@ -12,7 +12,7 @@ import {
 const records = ref<AdminFood[]>([])
 const total = ref(0)
 const page = ref(1)
-const size = 10
+const size = ref(10)
 const loading = ref(false)
 const keyword = ref('')
 const category = ref('')
@@ -38,7 +38,7 @@ async function load() {
   try {
     const res = await apiAdminListFoods({
       page: page.value,
-      size,
+      size: size.value,
       keyword: keyword.value || undefined,
       category: category.value || undefined,
     })
@@ -176,10 +176,12 @@ onMounted(load)
     <el-pagination
       v-if="total > size"
       class="pager"
-      layout="prev, pager, next, total"
+      layout="total, sizes, prev, pager, next"
       :total="total"
       :page-size="size"
+      :page-sizes="[10, 20, 50]"
       :current-page="page"
+      @size-change="(s: number) => { size = s; page = 1; load() }"
       @current-change="(p: number) => { page = p; load() }"
     />
 

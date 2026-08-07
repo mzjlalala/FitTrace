@@ -44,7 +44,7 @@ beforeEach(() => {
     data: {
       records: [mockItem(1, '杠铃卧推'), mockItem(2, '哑铃卧推')],
       total: 2,
-      size: 12,
+      size: 10,
       current: 1,
     },
   })
@@ -72,7 +72,7 @@ describe('ActionsView', () => {
 
     expect(mockedList).toHaveBeenLastCalledWith({
       page: 1,
-      size: 12,
+      size: 10,
       categoryId: undefined,
       difficulty: undefined,
       keyword: '卧推',

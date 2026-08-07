@@ -112,27 +112,27 @@ export interface Page<T> {
 }
 
 export const apiAdminListActions = (params: { page?: number; size?: number; keyword?: string; categoryId?: number }) =>
-  http.get<Page<AdminAction>>('/admin/actions', { params })
+  http.post<Page<AdminAction>>('/admin/actions/query', params)
 export const apiAdminCreateAction = (data: AdminActionInput) => http.post<AdminAction>('/admin/actions', data)
 export const apiAdminUpdateAction = (id: number, data: AdminActionInput) =>
   http.put<AdminAction>(`/admin/actions/${id}`, data)
 export const apiAdminDeleteAction = (id: number) => http.delete<void>(`/admin/actions/${id}`)
 
 export const apiAdminListPlans = (params: { page?: number; size?: number; keyword?: string; goal?: string }) =>
-  http.get<Page<AdminPlan>>('/admin/plans', { params })
+  http.post<Page<AdminPlan>>('/admin/plans/query', params)
 export const apiAdminCreatePlan = (data: AdminPlanInput) => http.post<AdminPlan>('/admin/plans', data)
 export const apiAdminUpdatePlan = (id: number, data: AdminPlanInput) =>
   http.put<AdminPlan>(`/admin/plans/${id}`, data)
 export const apiAdminDeletePlan = (id: number) => http.delete<void>(`/admin/plans/${id}`)
 
 export const apiAdminListFoods = (params: { page?: number; size?: number; keyword?: string; category?: string }) =>
-  http.get<Page<AdminFood>>('/admin/foods', { params })
+  http.post<Page<AdminFood>>('/admin/foods/query', params)
 export const apiAdminCreateFood = (data: AdminFoodInput) => http.post<AdminFood>('/admin/foods', data)
 export const apiAdminUpdateFood = (id: number, data: AdminFoodInput) =>
   http.put<AdminFood>(`/admin/foods/${id}`, data)
 export const apiAdminDeleteFood = (id: number) => http.delete<void>(`/admin/foods/${id}`)
 
 export const apiAdminListUsers = (params: { page?: number; size?: number; keyword?: string }) =>
-  http.get<Page<AdminUser>>('/admin/users', { params })
+  http.post<Page<AdminUser>>('/admin/users/query', params)
 export const apiAdminUpdateUserStatus = (id: number, status: number) =>
   http.put<AdminUser>(`/admin/users/${id}/status`, { status })

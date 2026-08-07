@@ -56,5 +56,5 @@ export const MUSCLE_LABEL: Record<string, string> = {
 
 export const apiGetCategories = () => http.get<ActionCategory[]>('/actions/categories')
 export const apiListActions = (params: ActionListParams) =>
-  http.get<PageResult<ActionListItem>>('/actions', { params })
+  http.post<PageResult<ActionListItem>>('/actions/query', params)
 export const apiGetAction = (id: number) => http.get<ActionDetail>(`/actions/${id}`)

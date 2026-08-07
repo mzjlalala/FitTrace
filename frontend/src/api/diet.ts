@@ -40,7 +40,7 @@ export interface DietSummary {
 }
 
 export const apiListFoods = (params: { page?: number; size?: number; keyword?: string; category?: string }) =>
-  http.get<{ records: DietFood[]; total: number; size: number; current: number }>('/diet/foods', { params })
+  http.post<{ records: DietFood[]; total: number; size: number; current: number }>('/diet/foods/query', params)
 export const apiGetFood = (id: number) => http.get<DietFood>(`/diet/foods/${id}`)
 export const apiCreateDietRecord = (data: DietRecordInput) =>
   http.post<DietRecord>('/diet/records', data)

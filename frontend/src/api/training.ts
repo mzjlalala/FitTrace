@@ -67,9 +67,9 @@ export interface HeatmapDay {
 export const apiCreateTrainingRecord = (data: TrainingRecordInput) =>
   http.post<TrainingRecordDetail>('/training-records', data)
 export const apiListTrainingRecords = (page: number, size: number, startDate?: string, endDate?: string) =>
-  http.get<{ records: TrainingRecordVO[]; total: number; size: number; current: number }>(
-    '/training-records',
-    { params: { page, size, startDate, endDate } },
+  http.post<{ records: TrainingRecordVO[]; total: number; size: number; current: number }>(
+    '/training-records/query',
+    { page, size, startDate, endDate },
   )
 export const apiGetTrainingRecord = (id: number) =>
   http.get<TrainingRecordDetail>(`/training-records/${id}`)

@@ -19,6 +19,13 @@ const page = ref(1)
 const size = ref(10)
 const loading = ref(false)
 
+/** 日期范围筛选（默认当月：月初 ~ 今天） */
+function fmt(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+const todayStr = fmt(new Date())
+const dateRange = ref<[string, string]>([fmt(new Date(new Date().getFullYear(), new Date().getMonth(), 1)), todayStr])
+
 const dialogVisible = ref(false)
 const drawerVisible = ref(false)
 const submitting = ref(false)
@@ -66,7 +73,7 @@ const dialogTitle = computed(() => (editingId.value ? '编辑训练记录' : '�
 async function loadRecords() {
   loading.value = true
   try {
-    const res = await apiListTrainingRecords(page.value, size.value)
+    const res = await apiListTrainingRecords(page.value, size.value, dateRange.value?.[0], dateRange.value?.[1])
     records.value = res.data.records
     total.value = res.data.total
   } catch {
@@ -74,6 +81,11 @@ async function loadRecords() {
   } finally {
     loading.value = false
   }
+}
+
+function onRangeChange() {
+  page.value = 1
+  loadRecords()
 }
 
 function addSetRow() {
@@ -184,7 +196,19 @@ onMounted(async () => {
   <div class="training-page">
     <div class="toolbar">
       <h2>训练记录</h2>
-      <el-button type="primary" @click="openCreate">记录训练</el-button>
+      <div class="toolbar-right">
+        <el-date-picker
+          v-model="dateRange"
+          type="daterange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          value-format="YYYY-MM-DD"
+          style="width: 260px"
+          @change="onRangeChange"
+        />
+        <el-button type="primary" @click="openCreate">记录训练</el-button>
+      </div>
     </div>
 
     <el-table v-loading="loading" :data="records" empty-text="还没有训练记录，点击右上角开始">
@@ -333,6 +357,11 @@ onMounted(async () => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
+}
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 .pager {
   margin-top: 16px;

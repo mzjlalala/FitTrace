@@ -95,6 +95,14 @@ describe('TrainingView', () => {
     expect(wrapper.text()).toContain('60 分钟')
     expect(wrapper.text()).toContain('状态好')
     expect(wrapper.text()).toContain('卧推日')
+
+    // 默认按当月范围查询：起始为当月 1 号，结束为今天
+    expect(vi.mocked(apiListTrainingRecords)).toHaveBeenCalledWith(
+      1,
+      10,
+      expect.stringMatching(/^\d{4}-\d{2}-01$/),
+      expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+    )
   })
 
   it('opens create dialog when clicking 记录训练', async () => {

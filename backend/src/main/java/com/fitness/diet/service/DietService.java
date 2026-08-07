@@ -12,10 +12,12 @@ import com.fitness.diet.mapper.DietFoodMapper;
 import com.fitness.diet.mapper.DietRecordMapper;
 import com.fitness.diet.vo.DietFoodVO;
 import com.fitness.diet.vo.DietRecordVO;
+import com.fitness.diet.vo.DietSummaryVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -103,6 +105,29 @@ public class DietService {
     public void delete(Long userId, Long id) {
         requireOwned(userId, id);
         dietRecordMapper.deleteById(id);
+    }
+
+    /**
+     * 每日营养汇总：范围内每天一条（按食物换算求和，保留 1 位），无记录的天补 0；
+     * 起始日期晚于结束日期时返回空列表
+     */
+    public List<DietSummaryVO> summary(Long userId, LocalDate startDate, LocalDate endDate) {
+        if (startDate.isAfter(endDate)) {
+            return List.of();
+        }
+        Map<LocalDate, DietRecordMapper.SummaryRow> rows = dietRecordMapper
+                .selectSummary(userId, startDate, endDate).stream()
+                .collect(Collectors.toMap(DietRecordMapper.SummaryRow::getRecordDate, r -> r));
+        return startDate.datesUntil(endDate.plusDays(1)).map(d -> {
+            DietSummaryVO vo = new DietSummaryVO();
+            vo.setDate(d);
+            DietRecordMapper.SummaryRow row = rows.get(d);
+            vo.setCaloriesKcal(row == null ? BigDecimal.ZERO.setScale(1) : row.getCaloriesKcal());
+            vo.setProteinG(row == null ? BigDecimal.ZERO.setScale(1) : row.getProteinG());
+            vo.setFatG(row == null ? BigDecimal.ZERO.setScale(1) : row.getFatG());
+            vo.setCarbG(row == null ? BigDecimal.ZERO.setScale(1) : row.getCarbG());
+            return vo;
+        }).toList();
     }
 
     /**

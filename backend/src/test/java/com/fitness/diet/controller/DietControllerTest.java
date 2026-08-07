@@ -274,4 +274,56 @@ class DietControllerTest {
                 .andExpect(jsonPath("$.data.length()").value(0));
         assertThat(true).isTrue();
     }
+
+    @Test
+    void summary_twoDaysNutritionSums() throws Exception {
+        String token = registerAndLogin(genUsername());
+        int riceId = foodIdByName(token, "米饭");
+        int chickenId = foodIdByName(token, "鸡胸肉");
+        // 今天：300g 米饭（348 kcal）+ 100g 鸡胸肉（133 kcal）= 481 kcal
+        mockMvc.perform(post("/api/diet/records").header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(recordBody(riceId, 300, "LUNCH", LocalDate.now().toString())))
+                .andExpect(jsonPath("$.code").value(200));
+        mockMvc.perform(post("/api/diet/records").header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(recordBody(chickenId, 100, "DINNER", LocalDate.now().toString())))
+                .andExpect(jsonPath("$.code").value(200));
+        // 昨天：1 根香蕉约 100g（93 kcal）
+        int bananaId = foodIdByName(token, "香蕉");
+        mockMvc.perform(post("/api/diet/records").header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(recordBody(bananaId, 100, "SNACK", LocalDate.now().minusDays(1).toString())))
+                .andExpect(jsonPath("$.code").value(200));
+
+        mockMvc.perform(get("/api/diet/records/summary?startDate=" + LocalDate.now().minusDays(2)
+                        + "&endDate=" + LocalDate.now())
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.length()").value(3))
+                .andExpect(jsonPath("$.data[0].date").value(LocalDate.now().minusDays(2).toString()))
+                .andExpect(jsonPath("$.data[0].caloriesKcal").value(0.0))   // 无记录补 0
+                .andExpect(jsonPath("$.data[1].date").value(LocalDate.now().minusDays(1).toString()))
+                .andExpect(jsonPath("$.data[1].caloriesKcal").value(93.0))  // 香蕉 93
+                .andExpect(jsonPath("$.data[2].date").value(LocalDate.now().toString()))
+                .andExpect(jsonPath("$.data[2].caloriesKcal").value(481.0)) // 米饭 348 + 鸡胸 133
+                .andExpect(jsonPath("$.data[2].proteinG").value(32.4));     // 7.8 + 24.6
+    }
+
+    @Test
+    void summary_startAfterEnd_returnsEmpty() throws Exception {
+        String token = registerAndLogin(genUsername());
+        mockMvc.perform(get("/api/diet/records/summary?startDate=" + LocalDate.now()
+                        + "&endDate=" + LocalDate.now().minusDays(1))
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.length()").value(0));
+    }
+
+    @Test
+    void summary_withoutToken_returnsHttp401() throws Exception {
+        mockMvc.perform(get("/api/diet/records/summary?startDate=" + LocalDate.now()
+                        + "&endDate=" + LocalDate.now()))
+                .andExpect(status().isUnauthorized());
+    }
 }

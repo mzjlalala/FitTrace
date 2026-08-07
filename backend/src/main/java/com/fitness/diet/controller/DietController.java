@@ -6,6 +6,7 @@ import com.fitness.diet.dto.DietRecordCreateRequest;
 import com.fitness.diet.service.DietService;
 import com.fitness.diet.vo.DietFoodVO;
 import com.fitness.diet.vo.DietRecordVO;
+import com.fitness.diet.vo.DietSummaryVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -89,5 +90,16 @@ public class DietController {
     public Response<Void> delete(@AuthenticationPrincipal Long userId, @PathVariable Long id) {
         dietService.delete(userId, id);
         return Response.ok(null);
+    }
+
+    /**
+     * 每日营养汇总：按日期范围返回每天热量/蛋白质/脂肪/碳水（无记录的天为 0）
+     */
+    @GetMapping("/records/summary")
+    public Response<List<DietSummaryVO>> summary(
+            @AuthenticationPrincipal Long userId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return Response.ok(dietService.summary(userId, startDate, endDate));
     }
 }

@@ -119,4 +119,34 @@ class TrainingStatsControllerTest {
     void summary_withoutToken_returnsHttp401() throws Exception {
         mockMvc.perform(get("/api/training/stats/summary")).andExpect(status().isUnauthorized());
     }
+
+    @Test
+    void heatmap_365DaysWithCountsAtRecordedDates() throws Exception {
+        String token = registerAndLogin(genUsername());
+        int actionId = firstActionId(token);
+        String setsJson = "[{\"actionId\":" + actionId + ",\"weightKg\":60,\"reps\":10,\"doneFlag\":true}]";
+        postRecord(token, LocalDate.now().toString(), 60, setsJson);
+        postRecord(token, LocalDate.now().minusDays(31).toString(), 45, setsJson);
+        postRecord(token, LocalDate.now().minusDays(31).toString(), 30, setsJson);
+
+        MvcResult result = mockMvc.perform(get("/api/training/stats/heatmap")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.length()").value(365))
+                .andExpect(jsonPath("$.data[0].date")
+                        .value(LocalDate.now().minusDays(364).toString()))
+                .andExpect(jsonPath("$.data[364].date").value(LocalDate.now().toString()))
+                .andReturn();
+        String json = result.getResponse().getContentAsString();
+        List<Integer> counts = JsonPath.read(json, "$.data[*].count");
+        assertThat(counts.get(364)).isEqualTo(1);      // 今天
+        assertThat(counts.get(364 - 31)).isEqualTo(2); // 31 天前同一天 2 条
+        assertThat(counts.get(0)).isEqualTo(0);        // 起点天无记录
+    }
+
+    @Test
+    void heatmap_withoutToken_returnsHttp401() throws Exception {
+        mockMvc.perform(get("/api/training/stats/heatmap")).andExpect(status().isUnauthorized());
+    }
 }

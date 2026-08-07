@@ -6,6 +6,7 @@ import com.fitness.action.mapper.ActionMapper;
 import com.fitness.training.entity.TrainingRecord;
 import com.fitness.training.mapper.TrainingRecordMapper;
 import com.fitness.training.mapper.TrainingRecordSetMapper;
+import com.fitness.training.vo.HeatmapDayVO;
 import com.fitness.training.vo.PrItemVO;
 import com.fitness.training.vo.TrainingStatsSummaryVO;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +50,22 @@ public class TrainingStatsService {
                 .map(r -> PrItemVO.of(r, actionNames.get(r.getActionId())))
                 .toList());
         return vo;
+    }
+
+    /**
+     * 热力图数据：最近 365 天（含今天）每天记录条数，无记录的天补 count=0，按日期升序
+     */
+    public List<HeatmapDayVO> heatmap(Long userId) {
+        LocalDate from = LocalDate.now().minusDays(364);
+        Map<LocalDate, Long> counts = trainingRecordMapper.selectHeatmap(userId, from).stream()
+                .collect(Collectors.toMap(TrainingRecordMapper.HeatmapRow::getTrainingDate,
+                        TrainingRecordMapper.HeatmapRow::getCount));
+        return from.datesUntil(LocalDate.now().plusDays(1)).map(d -> {
+            HeatmapDayVO vo = new HeatmapDayVO();
+            vo.setDate(d);
+            vo.setCount(counts.getOrDefault(d, 0L));
+            return vo;
+        }).toList();
     }
 
     /**

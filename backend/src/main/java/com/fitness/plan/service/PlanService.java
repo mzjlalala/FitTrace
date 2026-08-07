@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * 训练计划服务：列表筛选、按用户资料推荐、详情树组装
+ */
 @Service
 @RequiredArgsConstructor
 public class PlanService {
@@ -40,6 +43,9 @@ public class PlanService {
     private final ActionMapper actionMapper;
     private final UserProfileMapper userProfileMapper;
 
+    /**
+     * 查询上架计划，可按目标/水平筛选，按 id 升序
+     */
     public List<PlanVO> listPlans(String goal, String level) {
         return planMapper.selectList(Wrappers.<Plan>lambdaQuery()
                         .eq(Plan::getStatus, 1)
@@ -64,6 +70,9 @@ public class PlanService {
                 .map(PlanVO::of).toList();
     }
 
+    /**
+     * 按 id 校验并返回上架计划，不存在或已下架抛 404 业务异常
+     */
     public Plan requirePlan(Long id) {
         Plan plan = planMapper.selectById(id);
         if (plan == null || plan.getStatus() == null || plan.getStatus() != 1) {

@@ -12,9 +12,12 @@ import lombok.Data;
 @TableName("plan_day_action")
 public class PlanDayAction {
 
+    /** 主键 */
     @TableId(type = IdType.AUTO)
     private Long id;
+    /** 所属计划日 ID */
     private Long planDayId;
+    /** 动作 ID */
     private Long actionId;
     /** 动作顺序（越小越靠前） */
     private Integer sort;
@@ -22,7 +25,7 @@ public class PlanDayAction {
     private Integer sets;
     /** 每组建议次数 */
     private Integer reps;
-    /** 重量模式（FIXED/递增等） */
+    /** 重量模式（FIXED=固定重量/递增等） */
     private String weightMode;
     /** 组间休息秒数 */
     private Integer restSeconds;

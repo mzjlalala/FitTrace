@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * 计划订阅服务：开始（订阅）计划、我的订阅列表、更新订阅状态
+ */
 @Service
 @RequiredArgsConstructor
 public class UserPlanService {
@@ -25,6 +28,9 @@ public class UserPlanService {
     private final PlanMapper planMapper;
     private final PlanService planService;
 
+    /**
+     * 开始计划：校验计划存在，同一计划已有 ACTIVE 订阅时抛 409，插入 ACTIVE 记录
+     */
     @Transactional
     public UserPlanVO start(Long userId, Long planId) {
         planService.requirePlan(planId);
@@ -44,6 +50,9 @@ public class UserPlanService {
         return UserPlanVO.of(up, planMapper.selectById(planId));
     }
 
+    /**
+     * 当前用户全部订阅记录（批量补计划信息，按开始日期倒序）
+     */
     public List<UserPlanVO> listMine(Long userId) {
         List<UserPlan> ups = userPlanMapper.selectList(Wrappers.<UserPlan>lambdaQuery()
                 .eq(UserPlan::getUserId, userId)
@@ -56,6 +65,9 @@ public class UserPlanService {
         return ups.stream().map(up -> UserPlanVO.of(up, planMap.get(up.getPlanId()))).toList();
     }
 
+    /**
+     * 更新订阅状态（COMPLETED/QUIT）；非本人订阅抛 404
+     */
     @Transactional
     public UserPlanVO updateStatus(Long userId, Long id, String status) {
         UserPlan up = userPlanMapper.selectById(id);

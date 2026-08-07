@@ -19,6 +19,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * 动作库服务：分类、列表筛选分页、详情
+ */
 @Service
 @RequiredArgsConstructor
 public class ActionService {
@@ -26,11 +29,17 @@ public class ActionService {
     private final ActionMapper actionMapper;
     private final ActionCategoryMapper actionCategoryMapper;
 
+    /**
+     * 获取动作分类列表（按 sort 升序）
+     */
     public List<ActionCategory> listCategories() {
         return actionCategoryMapper.selectList(
                 Wrappers.<ActionCategory>lambdaQuery().orderByAsc(ActionCategory::getSort));
     }
 
+    /**
+     * 分页查询上架动作：支持分类/肌群/难度/名称关键字筛选，批量补分类名
+     */
     public IPage<ActionListItemVO> listActions(Long categoryId, String muscleGroup, String difficulty,
                                                String keyword, long page, long size) {
         Page<Action> p = new Page<>(page, size);
@@ -56,6 +65,9 @@ public class ActionService {
         return result;
     }
 
+    /**
+     * 获取动作详情（含教程内容），不存在或已下架抛 404 业务异常
+     */
     public ActionDetailVO getActionDetail(Long id) {
         Action action = actionMapper.selectById(id);
         if (action == null || action.getStatus() == null || action.getStatus() != 1) {

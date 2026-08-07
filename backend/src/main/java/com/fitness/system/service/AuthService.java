@@ -21,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 认证服务：注册、登录（JWT 签发）、登出（token 黑名单）
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -31,6 +34,9 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final StringRedisTemplate redisTemplate;
 
+    /**
+     * 注册新用户：用户名唯一性校验（含并发兜底）、bcrypt 加密密码、插入默认个人资料
+     */
     @Transactional
     public SysUser register(RegisterRequest req) {
         Long count = sysUserMapper.selectCount(
@@ -57,6 +63,9 @@ public class AuthService {
         return user;
     }
 
+    /**
+     * 登录：校验用户名/密码与账号状态，签发 JWT（含 jti）
+     */
     public LoginResponse login(LoginRequest req) {
         SysUser user = sysUserMapper.selectOne(
                 Wrappers.<SysUser>lambdaQuery().eq(SysUser::getUsername, req.getUsername()));
@@ -70,6 +79,9 @@ public class AuthService {
         return new LoginResponse(token, user);
     }
 
+    /**
+     * 登出：将 token 的 jti 加入 Redis 黑名单（TTL=剩余有效期），token 立即失效
+     */
     public void logout(String token) {
         if (token == null || token.isBlank()) {
             return;

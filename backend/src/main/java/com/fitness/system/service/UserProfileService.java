@@ -13,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 用户信息服务：个人信息与身体数据的查询与维护
+ */
 @Service
 @RequiredArgsConstructor
 public class UserProfileService {
@@ -20,11 +23,17 @@ public class UserProfileService {
     private final SysUserMapper sysUserMapper;
     private final UserProfileMapper userProfileMapper;
 
+    /**
+     * 获取用户信息，身体资料缺失时自动初始化一条空记录
+     */
     public UserInfoVO getProfile(Long userId) {
         SysUser user = requireUser(userId);
         return UserInfoVO.of(user, getOrCreateProfile(userId));
     }
 
+    /**
+     * 更新用户信息：昵称非空才更新；身体数据整体提交（null 字段直接置空）
+     */
     @Transactional
     public UserInfoVO updateProfile(Long userId, UserProfileUpdateRequest req) {
         SysUser user = requireUser(userId);

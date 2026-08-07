@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * 健康检查接口：探测数据库与 Redis 连通性（无需登录）
+ */
 @RestController
 @RequiredArgsConstructor
 public class HealthController {
@@ -18,6 +21,9 @@ public class HealthController {
     private final JdbcTemplate jdbcTemplate;
     private final StringRedisTemplate redisTemplate;
 
+    /**
+     * 返回 { db: up/down, redis: up/down }，供前端展示服务健康状态
+     */
     @GetMapping("/api/health")
     public Response<Map<String, Object>> health() {
         boolean dbOk = false;

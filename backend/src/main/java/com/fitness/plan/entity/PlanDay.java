@@ -12,8 +12,10 @@ import lombok.Data;
 @TableName("plan_day")
 public class PlanDay {
 
+    /** 主键 */
     @TableId(type = IdType.AUTO)
     private Long id;
+    /** 所属计划周 ID */
     private Long planWeekId;
     /** 第几天（从 1 开始） */
     private Integer dayNo;

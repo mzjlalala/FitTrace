@@ -22,7 +22,9 @@ const router = createRouter({
       children: [
         { path: '', name: 'home', component: HomeView },
         { path: 'actions', name: 'actions', component: () => import('@/views/ActionsView.vue') },
+        { path: 'actions/:id', name: 'action-detail', component: () => import('@/views/ActionDetailView.vue') },
         { path: 'plans', name: 'plans', component: () => import('@/views/PlansView.vue') },
+        { path: 'plans/:id', name: 'plan-detail', component: () => import('@/views/PlanDetailView.vue') },
         { path: 'training', name: 'training', component: () => import('@/views/TrainingView.vue') },
         { path: 'profile', name: 'profile', component: () => import('@/views/ProfileView.vue') },
       ],

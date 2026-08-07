@@ -1,13 +1,16 @@
 package com.fitness.action.service;
 
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fitness.action.entity.Action;
 import com.fitness.action.entity.ActionCategory;
 import com.fitness.action.mapper.ActionCategoryMapper;
 import com.fitness.action.mapper.ActionMapper;
+import com.fitness.action.vo.ActionDetailVO;
 import com.fitness.action.vo.ActionListItemVO;
+import com.fitness.common.api.ResultCode;
+import com.fitness.common.exception.BizException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -51,5 +54,15 @@ public class ActionService {
                         a.getCategoryId() == null ? null : categoryNames.get(a.getCategoryId())))
                 .toList());
         return result;
+    }
+
+    public ActionDetailVO getActionDetail(Long id) {
+        Action action = actionMapper.selectById(id);
+        if (action == null || action.getStatus() == null || action.getStatus() != 1) {
+            throw new BizException(ResultCode.NOT_FOUND, "动作不存在");
+        }
+        String categoryName = action.getCategoryId() == null ? null
+                : actionCategoryMapper.selectById(action.getCategoryId()).getName();
+        return ActionDetailVO.of(action, categoryName);
     }
 }

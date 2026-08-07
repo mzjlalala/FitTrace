@@ -124,4 +124,34 @@ class ActionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.records.length()").value(0));
     }
+
+    @Test
+    void detail_returnsTutorialContent() throws Exception {
+        String token = loginAndGetToken();
+        MvcResult listResult = mockMvc.perform(get("/api/actions").param("keyword", "俯卧撑")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk()).andReturn();
+        int pushUpId = ((List<Integer>) JsonPath.read(listResult.getResponse().getContentAsString(),
+                "$.data.records[*].id")).get(0);
+
+        mockMvc.perform(get("/api/actions/" + pushUpId)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.name").value("俯卧撑"))
+                .andExpect(jsonPath("$.data.steps.length()").value(4))
+                .andExpect(jsonPath("$.data.steps[0]").isNotEmpty())
+                .andExpect(jsonPath("$.data.tips.length()").value(3))
+                .andExpect(jsonPath("$.data.cautions.length()").value(2))
+                .andExpect(jsonPath("$.data.videoUrl").doesNotExist());
+    }
+
+    @Test
+    void detail_notFound_returns404Code() throws Exception {
+        mockMvc.perform(get("/api/actions/999999")
+                        .header("Authorization", "Bearer " + loginAndGetToken()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(404))
+                .andExpect(jsonPath("$.message").value("动作不存在"));
+    }
 }

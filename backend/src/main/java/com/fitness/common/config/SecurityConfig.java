@@ -1,7 +1,7 @@
 package com.fitness.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fitness.common.api.R;
+import com.fitness.common.api.Response;
 import com.fitness.common.api.ResultCode;
 import com.fitness.common.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +43,7 @@ public class SecurityConfig {
                     response.setStatus(401);
                     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                     response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-                    response.getWriter().write(objectMapper.writeValueAsString(R.fail(ResultCode.UNAUTHORIZED)));
+                    response.getWriter().write(objectMapper.writeValueAsString(Response.fail(ResultCode.UNAUTHORIZED)));
                 }))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

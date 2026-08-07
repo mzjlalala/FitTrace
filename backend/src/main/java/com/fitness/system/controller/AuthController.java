@@ -1,6 +1,6 @@
 package com.fitness.system.controller;
 
-import com.fitness.common.api.R;
+import com.fitness.common.api.Response;
 import com.fitness.system.dto.LoginRequest;
 import com.fitness.system.dto.RegisterRequest;
 import com.fitness.system.entity.SysUser;
@@ -22,21 +22,21 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public R<SysUser> register(@Valid @RequestBody RegisterRequest req) {
-        return R.ok(authService.register(req));
+    public Response<SysUser> register(@Valid @RequestBody RegisterRequest req) {
+        return Response.ok(authService.register(req));
     }
 
     @PostMapping("/login")
-    public R<LoginResponse> login(@Valid @RequestBody LoginRequest req) {
-        return R.ok(authService.login(req));
+    public Response<LoginResponse> login(@Valid @RequestBody LoginRequest req) {
+        return Response.ok(authService.login(req));
     }
 
     @PostMapping("/logout")
-    public R<Void> logout(HttpServletRequest request) {
+    public Response<Void> logout(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         String token = header != null && header.startsWith("Bearer ")
                 ? header.substring(7) : null;
         authService.logout(token);
-        return R.ok();
+        return Response.ok();
     }
 }

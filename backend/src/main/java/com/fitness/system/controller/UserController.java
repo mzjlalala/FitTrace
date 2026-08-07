@@ -1,6 +1,6 @@
 package com.fitness.system.controller;
 
-import com.fitness.common.api.R;
+import com.fitness.common.api.Response;
 import com.fitness.system.dto.UserProfileUpdateRequest;
 import com.fitness.system.service.UserProfileService;
 import com.fitness.system.vo.UserInfoVO;
@@ -21,13 +21,13 @@ public class UserController {
     private final UserProfileService userProfileService;
 
     @GetMapping("/profile")
-    public R<UserInfoVO> getProfile(@AuthenticationPrincipal Long userId) {
-        return R.ok(userProfileService.getProfile(userId));
+    public Response<UserInfoVO> getProfile(@AuthenticationPrincipal Long userId) {
+        return Response.ok(userProfileService.getProfile(userId));
     }
 
     @PutMapping("/profile")
-    public R<UserInfoVO> updateProfile(@AuthenticationPrincipal Long userId,
+    public Response<UserInfoVO> updateProfile(@AuthenticationPrincipal Long userId,
                                        @Valid @RequestBody UserProfileUpdateRequest req) {
-        return R.ok(userProfileService.updateProfile(userId, req));
+        return Response.ok(userProfileService.updateProfile(userId, req));
     }
 }

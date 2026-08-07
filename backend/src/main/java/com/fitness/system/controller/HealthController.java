@@ -1,6 +1,6 @@
 package com.fitness.system.controller;
 
-import com.fitness.common.api.R;
+import com.fitness.common.api.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -19,7 +19,7 @@ public class HealthController {
     private final StringRedisTemplate redisTemplate;
 
     @GetMapping("/api/health")
-    public R<Map<String, Object>> health() {
+    public Response<Map<String, Object>> health() {
         boolean dbOk = false;
         boolean redisOk = false;
         try {
@@ -34,6 +34,6 @@ public class HealthController {
         Map<String, Object> status = new LinkedHashMap<>();
         status.put("db", dbOk ? "up" : "down");
         status.put("redis", redisOk ? "up" : "down");
-        return R.ok(status);
+        return Response.ok(status);
     }
 }

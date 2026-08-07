@@ -1,6 +1,6 @@
 package com.fitness.common.exception;
 
-import com.fitness.common.api.R;
+import com.fitness.common.api.Response;
 import com.fitness.common.api.ResultCode;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestExceptionController {
 
     @GetMapping("/test/biz-ex")
-    public R<Void> biz() {
+    public Response<Void> biz() {
         throw new BizException(ResultCode.CONFLICT, "冲突了");
     }
 
     @GetMapping("/test/illegal")
-    public R<Void> illegal() {
+    public Response<Void> illegal() {
         throw new IllegalArgumentException("boom");
     }
 }

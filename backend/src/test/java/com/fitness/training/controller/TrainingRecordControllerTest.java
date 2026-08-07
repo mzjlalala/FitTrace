@@ -48,8 +48,9 @@ class TrainingRecordControllerTest {
     }
 
     private int firstActionId(String token) throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/actions?size=1")
-                        .header("Authorization", "Bearer " + token))
+        MvcResult result = mockMvc.perform(post("/api/actions/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"size\":1}"))
                 .andExpect(status().isOk()).andReturn();
         return JsonPath.read(result.getResponse().getContentAsString(), "$.data.records[0].id");
     }
@@ -170,7 +171,9 @@ class TrainingRecordControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"trainingDate\":\"2026-08-07\",\"sets\":[{\"actionId\":1}]}"))
                 .andExpect(status().isUnauthorized());
-        mockMvc.perform(get("/api/training-records")).andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/api/training-records/query")
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isUnauthorized());
         mockMvc.perform(get("/api/training-records/1")).andExpect(status().isUnauthorized());
     }
 
@@ -187,8 +190,9 @@ class TrainingRecordControllerTest {
                         .content(body.replace(LocalDate.now().toString(), LocalDate.now().minusDays(1).toString())))
                 .andExpect(jsonPath("$.code").value(200));
 
-        MvcResult result = mockMvc.perform(get("/api/training-records?page=1&size=1")
-                        .header("Authorization", "Bearer " + token))
+        MvcResult result = mockMvc.perform(post("/api/training-records/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"page\":1,\"size\":1}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.records.length()").value(1))
                 .andExpect(jsonPath("$.data.total").value(2)).andReturn();
@@ -197,8 +201,10 @@ class TrainingRecordControllerTest {
         assertThat(firstDate).isEqualTo(LocalDate.now().toString());
 
         // 日期筛选只取 startDate 之后（含）的记录
-        mockMvc.perform(get("/api/training-records?startDate=" + LocalDate.now())
-                        .header("Authorization", "Bearer " + token))
+        mockMvc.perform(post("/api/training-records/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"startDate\":\"" + LocalDate.now() + "\"}"))
                 .andExpect(jsonPath("$.data.total").value(1));
     }
 
@@ -305,8 +311,9 @@ class TrainingRecordControllerTest {
         mockMvc.perform(get("/api/training-records/" + recordId)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(jsonPath("$.code").value(404));
-        mockMvc.perform(get("/api/training-records")
-                        .header("Authorization", "Bearer " + token))
+        mockMvc.perform(post("/api/training-records/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(jsonPath("$.data.total").value(0));
     }
 

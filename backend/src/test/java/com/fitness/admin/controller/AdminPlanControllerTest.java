@@ -57,8 +57,9 @@ class AdminPlanControllerTest {
     }
 
     private int firstActionId(String token) throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/actions?size=1")
-                        .header("Authorization", "Bearer " + token))
+        MvcResult result = mockMvc.perform(post("/api/actions/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"size\":1}"))
                 .andExpect(status().isOk()).andReturn();
         return JsonPath.read(result.getResponse().getContentAsString(), "$.data.records[0].id");
     }

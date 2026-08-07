@@ -48,8 +48,9 @@ class DietControllerTest {
     }
 
     private int foodIdByName(String token, String name) throws Exception {
-        MvcResult result = mockMvc.perform(get("/api/diet/foods?size=100")
-                        .header("Authorization", "Bearer " + token))
+        MvcResult result = mockMvc.perform(post("/api/diet/foods/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"size\":100}"))
                 .andExpect(status().isOk()).andReturn();
         String json = result.getResponse().getContentAsString();
         List<Integer> ids = JsonPath.read(json, "$.data.records[?(@.name == '" + name + "')].id");
@@ -62,12 +63,13 @@ class DietControllerTest {
     }
 
     @Test
-    void foods_defaultPage_returns12OnShelfFoods() throws Exception {
+    void foods_defaultPage_returns10OnShelfFoods() throws Exception {
         String token = registerAndLogin(genUsername());
-        mockMvc.perform(get("/api/diet/foods")
-                        .header("Authorization", "Bearer " + token))
+        mockMvc.perform(post("/api/diet/foods/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.records.length()").value(12))
+                .andExpect(jsonPath("$.data.records.length()").value(10))
                 .andExpect(jsonPath("$.data.total").value(28))
                 .andExpect(jsonPath("$.data.records[0].caloriesPer100g").isNotEmpty());
     }
@@ -75,8 +77,9 @@ class DietControllerTest {
     @Test
     void foods_keywordFilter_onlyMatchingFoods() throws Exception {
         String token = registerAndLogin(genUsername());
-        mockMvc.perform(get("/api/diet/foods?keyword=鸡")
-                        .header("Authorization", "Bearer " + token))
+        mockMvc.perform(post("/api/diet/foods/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"keyword\":\"鸡\"}"))
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.total").value(2)); // 鸡胸肉 / 鸡蛋
     }
@@ -84,8 +87,9 @@ class DietControllerTest {
     @Test
     void foods_categoryFilter_onlyThatCategory() throws Exception {
         String token = registerAndLogin(genUsername());
-        mockMvc.perform(get("/api/diet/foods?category=水果")
-                        .header("Authorization", "Bearer " + token))
+        mockMvc.perform(post("/api/diet/foods/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"category\":\"水果\"}"))
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.total").value(4))
                 .andExpect(jsonPath("$.data.records[*].category").exists());
@@ -94,8 +98,9 @@ class DietControllerTest {
     @Test
     void foods_pageSize_returnsAtMostSize() throws Exception {
         String token = registerAndLogin(genUsername());
-        mockMvc.perform(get("/api/diet/foods?page=2&size=5")
-                        .header("Authorization", "Bearer " + token))
+        mockMvc.perform(post("/api/diet/foods/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"page\":2,\"size\":5}"))
                 .andExpect(jsonPath("$.data.records.length()").value(5));
     }
 
@@ -243,7 +248,9 @@ class DietControllerTest {
 
     @Test
     void allEndpoints_withoutToken_returnsHttp401() throws Exception {
-        mockMvc.perform(get("/api/diet/foods")).andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/api/diet/foods/query")
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isUnauthorized());
         mockMvc.perform(get("/api/diet/foods/1")).andExpect(status().isUnauthorized());
         mockMvc.perform(post("/api/diet/records")
                         .contentType(MediaType.APPLICATION_JSON)

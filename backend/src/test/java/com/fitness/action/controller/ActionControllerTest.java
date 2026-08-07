@@ -53,11 +53,12 @@ class ActionControllerTest {
 
     @Test
     void list_defaultPage_returnsUpToTwelve() throws Exception {
-        mockMvc.perform(get("/api/actions")
-                        .header("Authorization", "Bearer " + loginAndGetToken()))
+        mockMvc.perform(post("/api/actions/query")
+                        .header("Authorization", "Bearer " + loginAndGetToken())
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.records.length()").value(12))
+                .andExpect(jsonPath("$.data.records.length()").value(10))
                 .andExpect(jsonPath("$.data.total").value(30))
                 .andExpect(jsonPath("$.data.records[0].name").isNotEmpty())
                 .andExpect(jsonPath("$.data.records[0].categoryName").isNotEmpty());
@@ -72,8 +73,10 @@ class ActionControllerTest {
         int chestId = ((List<Integer>) JsonPath.read(catResult.getResponse().getContentAsString(),
                 "$.data[?(@.code == 'CHEST')].id")).get(0);
 
-        MvcResult result = mockMvc.perform(get("/api/actions").param("categoryId", String.valueOf(chestId))
-                        .header("Authorization", "Bearer " + token))
+        MvcResult result = mockMvc.perform(post("/api/actions/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"categoryId\":" + chestId + "}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200)).andReturn();
         assertThat(result.getResponse().getContentAsString()).contains("\"categoryName\":\"胸部\"");
@@ -81,8 +84,9 @@ class ActionControllerTest {
 
     @Test
     void list_keywordFilters_hitsBenchPress() throws Exception {
-        mockMvc.perform(get("/api/actions").param("keyword", "卧推")
-                        .header("Authorization", "Bearer " + loginAndGetToken()))
+        mockMvc.perform(post("/api/actions/query")
+                        .header("Authorization", "Bearer " + loginAndGetToken())
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"keyword\":\"卧推\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.records.length()").value(3))
@@ -93,18 +97,20 @@ class ActionControllerTest {
 
     @Test
     void list_difficultyFilter_onlyReturnsMatched() throws Exception {
-        mockMvc.perform(get("/api/actions").param("difficulty", "BEGINNER")
-                        .header("Authorization", "Bearer " + loginAndGetToken()))
+        mockMvc.perform(post("/api/actions/query")
+                        .header("Authorization", "Bearer " + loginAndGetToken())
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"difficulty\":\"BEGINNER\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.records.length()").value(12))
+                .andExpect(jsonPath("$.data.records.length()").value(10))
                 .andExpect(jsonPath("$.data.records[0].difficulty").value("BEGINNER"));
     }
 
     @Test
     void list_pagingSize_fiveReturnsUpToFive() throws Exception {
-        mockMvc.perform(get("/api/actions").param("size", "5")
-                        .header("Authorization", "Bearer " + loginAndGetToken()))
+        mockMvc.perform(post("/api/actions/query")
+                        .header("Authorization", "Bearer " + loginAndGetToken())
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"size\":5}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.records.length()").value(5))
@@ -113,14 +119,16 @@ class ActionControllerTest {
 
     @Test
     void list_withoutToken_returnsHttp401() throws Exception {
-        mockMvc.perform(get("/api/actions"))
+        mockMvc.perform(post("/api/actions/query")
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     void list_unknownDifficulty_returnsEmpty() throws Exception {
-        mockMvc.perform(get("/api/actions").param("difficulty", "NO_SUCH")
-                        .header("Authorization", "Bearer " + loginAndGetToken()))
+        mockMvc.perform(post("/api/actions/query")
+                        .header("Authorization", "Bearer " + loginAndGetToken())
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"difficulty\":\"NO_SUCH\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.records.length()").value(0));
     }
@@ -128,8 +136,9 @@ class ActionControllerTest {
     @Test
     void detail_returnsTutorialContent() throws Exception {
         String token = loginAndGetToken();
-        MvcResult listResult = mockMvc.perform(get("/api/actions").param("keyword", "俯卧撑")
-                        .header("Authorization", "Bearer " + token))
+        MvcResult listResult = mockMvc.perform(post("/api/actions/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"keyword\":\"俯卧撑\"}"))
                 .andExpect(status().isOk()).andReturn();
         int pushUpId = ((List<Integer>) JsonPath.read(listResult.getResponse().getContentAsString(),
                 "$.data.records[*].id")).get(0);

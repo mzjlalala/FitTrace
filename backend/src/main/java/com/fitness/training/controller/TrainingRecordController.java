@@ -3,12 +3,12 @@ package com.fitness.training.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.fitness.common.api.Response;
 import com.fitness.training.dto.TrainingRecordCreateRequest;
+import com.fitness.training.dto.TrainingRecordQueryRequest;
 import com.fitness.training.service.TrainingRecordService;
 import com.fitness.training.vo.TrainingRecordDetailVO;
 import com.fitness.training.vo.TrainingRecordVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,10 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.LocalDate;
 
 /**
  * 训练记录接口：创建 / 历史列表 / 详情 / 更新 / 删除
@@ -42,16 +39,14 @@ public class TrainingRecordController {
     }
 
     /**
-     * 我的训练历史：分页，按训练日期倒序，可选日期范围筛选
+     * 我的训练历史（POST body 传参）：分页，按训练日期倒序，可选日期范围筛选
      */
-    @GetMapping
-    public Response<IPage<TrainingRecordVO>> listMine(
-            @AuthenticationPrincipal Long userId,
-            @RequestParam(defaultValue = "1") long page,
-            @RequestParam(defaultValue = "10") long size,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return Response.ok(trainingRecordService.listMine(userId, startDate, endDate, page, size));
+    @PostMapping("/query")
+    public Response<IPage<TrainingRecordVO>> listMine(@AuthenticationPrincipal Long userId,
+                                                      @RequestBody TrainingRecordQueryRequest req) {
+        long page = req.getPage() == null ? 1 : req.getPage();
+        long size = req.getSize() == null ? 10 : req.getSize();
+        return Response.ok(trainingRecordService.listMine(userId, req.getStartDate(), req.getEndDate(), page, size));
     }
 
     /**

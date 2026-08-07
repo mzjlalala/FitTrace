@@ -2,6 +2,7 @@ package com.fitness.diet.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.fitness.common.api.Response;
+import com.fitness.diet.dto.DietFoodQueryRequest;
 import com.fitness.diet.dto.DietRecordCreateRequest;
 import com.fitness.diet.service.DietService;
 import com.fitness.diet.vo.DietFoodVO;
@@ -35,15 +36,13 @@ public class DietController {
     private final DietService dietService;
 
     /**
-     * 食物库分页查询：支持名称关键字与分类筛选
+     * 食物库分页查询（POST body 传参）：支持名称关键字与分类筛选
      */
-    @GetMapping("/foods")
-    public Response<IPage<DietFoodVO>> listFoods(
-            @RequestParam(defaultValue = "1") long page,
-            @RequestParam(defaultValue = "12") long size,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String category) {
-        return Response.ok(dietService.listFoods(keyword, category, page, size));
+    @PostMapping("/foods/query")
+    public Response<IPage<DietFoodVO>> listFoods(@RequestBody DietFoodQueryRequest req) {
+        long page = req.getPage() == null ? 1 : req.getPage();
+        long size = req.getSize() == null ? 10 : req.getSize();
+        return Response.ok(dietService.listFoods(req.getKeyword(), req.getCategory(), page, size));
     }
 
     /**

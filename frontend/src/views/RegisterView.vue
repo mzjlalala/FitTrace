@@ -64,7 +64,10 @@ async function onSubmit() {
     <el-card class="auth-card">
       <div class="brand">
         <div class="brand-logo">💪</div>
-        <h2 class="title">创建账号</h2>
+        <div class="brand-text">
+          <h2 class="title">FitTrace</h2>
+          <p class="subtitle">创建账号，开启健身之旅</p>
+        </div>
       </div>
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
         <el-form-item label="用户名" prop="username">
@@ -142,10 +145,19 @@ async function onSubmit() {
   border-radius: 12px;
   background: linear-gradient(135deg, #10b981, #22d3ee);
 }
+.brand-text {
+  text-align: left;
+}
 .title {
   margin: 0;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
+  color: #0d9467;
+}
+.subtitle {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #6b7280;
 }
 .submit {
   width: 100%;

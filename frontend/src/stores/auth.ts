@@ -38,15 +38,13 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = res.data
   }
 
-  async function logout() {
-    try {
-      await apiLogout()
-    } catch {
-      // 登出接口失败不阻塞本地清理
-    }
+  function logout() {
+    // 先同步清空本地状态，保证立即退出（不依赖服务端响应，避免跳转被守卫拦截）
     token.value = ''
     user.value = null
     localStorage.removeItem('fitness_token')
+    // 服务端黑名单请求尽力执行，失败不影响前端退出
+    apiLogout().catch(() => {})
   }
 
   return { token, user, isLoggedIn, isAdmin, login, register, fetchUser, logout }

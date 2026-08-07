@@ -6,6 +6,7 @@ const router = useRouter()
 const auth = useAuthStore()
 
 function onLogout() {
+  // logout 同步清理本地 token，之后立即跳转（守卫不再拦截）
   auth.logout()
   router.push('/login')
 }

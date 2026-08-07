@@ -20,6 +20,7 @@ function onLogout() {
         <el-menu-item index="/actions">动作库</el-menu-item>
         <el-menu-item index="/plans">计划中心</el-menu-item>
         <el-menu-item index="/training">训练记录</el-menu-item>
+        <el-menu-item index="/diet">饮食记录</el-menu-item>
         <el-menu-item index="/profile">个人中心</el-menu-item>
       </el-menu>
     </el-aside>

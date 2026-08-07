@@ -26,6 +26,7 @@ const router = createRouter({
         { path: 'plans', name: 'plans', component: () => import('@/views/PlansView.vue') },
         { path: 'plans/:id', name: 'plan-detail', component: () => import('@/views/PlanDetailView.vue') },
         { path: 'training', name: 'training', component: () => import('@/views/TrainingView.vue') },
+        { path: 'diet', name: 'diet', component: () => import('@/views/DietView.vue') },
         { path: 'profile', name: 'profile', component: () => import('@/views/ProfileView.vue') },
       ],
     },

@@ -136,13 +136,12 @@ class AdminActionControllerTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(jsonPath("$.code").value(404))
                 .andExpect(jsonPath("$.message").value("动作不存在"));
-        // 管理列表仍可见且 status=0（id 倒序，新建的排在第一条）
+        // 管理列表仍可见且 status=0（id 升序，新数据在列表尾部，按名称过滤断言）
         mockMvc.perform(post("/api/admin/actions/query")
                         .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON).content("{\"size\":1}"))
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"size\":100}"))
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.records[0].name").value("待下架动作"))
-                .andExpect(jsonPath("$.data.records[0].status").value(0));
+                .andExpect(jsonPath("$.data.records[?(@.name=='待下架动作')].status").value(0));
     }
 
     @Test

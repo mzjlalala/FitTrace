@@ -125,9 +125,8 @@ class AdminFoodControllerTest {
 
         mockMvc.perform(post("/api/admin/foods/query")
                         .header("Authorization", "Bearer " + token)
-                        .contentType(MediaType.APPLICATION_JSON).content("{\"size\":1}"))
-                .andExpect(jsonPath("$.data.records[0].name").value("待下架食物"))
-                .andExpect(jsonPath("$.data.records[0].status").value(0));
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"size\":100}"))
+                .andExpect(jsonPath("$.data.records[?(@.name=='待下架食物')].status").value(0));
     }
 
     @Test

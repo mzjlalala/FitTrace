@@ -17,6 +17,10 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: Asia/Shanghai
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
 server:
   port: 8080
 mybatis-plus:
@@ -30,3 +34,14 @@ logging:
 jwt:
   secret: 0lBhzWa5956Khbi6htVN2JVxnr4h+pC4JCgCqwSKF2UcrS1uCAdqdglIHcKIXV2Z
   expire-seconds: 86400
+oss:
+  # 是否启用阿里云 OSS（填入下方配置后改为 true）
+  enabled: false
+  # 地域节点，如 oss-cn-hangzhou.aliyuncs.com（与 bucket 同地域）
+  endpoint: ""
+  access-key-id: ""
+  access-key-secret: ""
+  # Bucket 名称
+  bucket: ""
+  # 图片访问 URL 前缀，如 https://fit-images.oss-cn-hangzhou.aliyuncs.com
+  url-prefix: ""

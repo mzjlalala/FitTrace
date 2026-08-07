@@ -3,3 +3,11 @@ spring:
     url: jdbc:postgresql://localhost:5432/fitness_test
     username: postgres
     password: 123456
+oss:
+  # 测试环境不连真实 OSS（OssControllerTest 用 @MockBean 替换客户端），仅配 url-prefix 供断言
+  enabled: false
+  endpoint: oss-cn-hangzhou.aliyuncs.com
+  access-key-id: test-key
+  access-key-secret: test-secret
+  bucket: fit-test
+  url-prefix: https://fit-test.oss-cn-hangzhou.aliyuncs.com

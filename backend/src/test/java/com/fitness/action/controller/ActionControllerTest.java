@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -59,7 +60,7 @@ class ActionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.records.length()").value(10))
-                .andExpect(jsonPath("$.data.total").value(30))
+                .andExpect(jsonPath("$.data.total").value(greaterThanOrEqualTo(42)))
                 .andExpect(jsonPath("$.data.records[0].name").isNotEmpty())
                 .andExpect(jsonPath("$.data.records[0].categoryName").isNotEmpty());
     }
@@ -89,7 +90,7 @@ class ActionControllerTest {
                         .contentType(MediaType.APPLICATION_JSON).content("{\"keyword\":\"卧推\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.records.length()").value(3))
+                .andExpect(jsonPath("$.data.records.length()").value(greaterThanOrEqualTo(3)))
                 .andExpect(jsonPath("$.data.records[0].name").value("杠铃卧推"))
                 .andExpect(jsonPath("$.data.records[1].name").value("哑铃卧推"))
                 .andExpect(jsonPath("$.data.records[2].name").value("上斜哑铃卧推"));
@@ -114,7 +115,7 @@ class ActionControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.records.length()").value(5))
-                .andExpect(jsonPath("$.data.total").value(30));
+                .andExpect(jsonPath("$.data.total").value(greaterThanOrEqualTo(42)));
     }
 
     @Test

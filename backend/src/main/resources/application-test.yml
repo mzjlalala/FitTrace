@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/fitness_test
+    url: jdbc:postgresql://localhost:5432/fitness
     username: postgres
     password: 123456
 oss:

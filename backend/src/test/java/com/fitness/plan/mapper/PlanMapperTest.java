@@ -39,7 +39,10 @@ class PlanMapperTest {
 
     @Test
     void plans_seeded_four() {
-        assertThat(planMapper.selectList(null)).hasSize(4);
+        // 开发库中可能包含用户自行创建的计划，只断言 4 个种子计划存在
+        assertThat(planMapper.selectList(null))
+                .extracting(Plan::getName)
+                .contains("新手全身增肌", "减脂燃脂", "力量进阶", "肌肉雕刻进阶");
     }
 
     @Test

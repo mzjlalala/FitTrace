@@ -58,11 +58,11 @@ class AdminAuthTest {
 
     @Test
     void adminToken_passesAdminAuthorization() throws Exception {
-        // /api/admin/actions 在 Task 3 实现，此处验证 admin token 通过 Security 授权层
-        // （HTTP 200 + 业务 404=路由未实现；USER token 同路径会返回 HTTP 403）
+        // 验证 admin token 通过 Security 授权层（USER token 同路径会返回 HTTP 403）
         String token = login("admin", "123456");
-        mockMvc.perform(get("/api/admin/actions")
-                        .header("Authorization", "Bearer " + token))
+        mockMvc.perform(post("/api/admin/actions/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isOk());
     }
 
@@ -82,13 +82,16 @@ class AdminAuthTest {
     @Test
     void userToken_adminEndpoint_returnsHttp403() throws Exception {
         String token = registerAndLogin();
-        mockMvc.perform(get("/api/admin/actions")
-                        .header("Authorization", "Bearer " + token))
+        mockMvc.perform(post("/api/admin/actions/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void noToken_adminEndpoint_returnsHttp401() throws Exception {
-        mockMvc.perform(get("/api/admin/actions")).andExpect(status().isUnauthorized());
+        mockMvc.perform(post("/api/admin/actions/query")
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isUnauthorized());
     }
 }

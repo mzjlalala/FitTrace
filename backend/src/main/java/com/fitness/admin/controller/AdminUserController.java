@@ -1,6 +1,7 @@
 package com.fitness.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.fitness.admin.dto.AdminUserQueryRequest;
 import com.fitness.admin.dto.AdminUserStatusRequest;
 import com.fitness.admin.service.AdminUserService;
 import com.fitness.admin.vo.AdminUserVO;
@@ -8,12 +9,11 @@ import com.fitness.common.api.Response;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -27,14 +27,13 @@ public class AdminUserController {
     private final AdminUserService adminUserService;
 
     /**
-     * 全量分页列表（不含密码），支持用户名/昵称关键字筛选
+     * 全量分页列表（POST body 传参，不含密码），支持用户名/昵称关键字筛选
      */
-    @GetMapping
-    public Response<IPage<AdminUserVO>> list(
-            @RequestParam(defaultValue = "1") long page,
-            @RequestParam(defaultValue = "10") long size,
-            @RequestParam(required = false) String keyword) {
-        return Response.ok(adminUserService.list(keyword, page, size));
+    @PostMapping("/query")
+    public Response<IPage<AdminUserVO>> list(@RequestBody AdminUserQueryRequest req) {
+        long page = req.getPage() == null ? 1 : req.getPage();
+        long size = req.getSize() == null ? 10 : req.getSize();
+        return Response.ok(adminUserService.list(req.getKeyword(), page, size));
     }
 
     /**

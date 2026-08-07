@@ -1,6 +1,7 @@
 package com.fitness.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.fitness.admin.dto.AdminPlanQueryRequest;
 import com.fitness.admin.dto.AdminPlanRequest;
 import com.fitness.admin.service.AdminPlanService;
 import com.fitness.admin.vo.AdminPlanVO;
@@ -8,13 +9,11 @@ import com.fitness.common.api.Response;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -28,15 +27,13 @@ public class AdminPlanController {
     private final AdminPlanService adminPlanService;
 
     /**
-     * 全量分页列表（含下架数据），支持名称关键字与目标筛选
+     * 全量分页列表（POST body 传参，含下架数据），支持名称关键字与目标筛选
      */
-    @GetMapping
-    public Response<IPage<AdminPlanVO>> list(
-            @RequestParam(defaultValue = "1") long page,
-            @RequestParam(defaultValue = "10") long size,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String goal) {
-        return Response.ok(adminPlanService.list(keyword, goal, page, size));
+    @PostMapping("/query")
+    public Response<IPage<AdminPlanVO>> list(@RequestBody AdminPlanQueryRequest req) {
+        long page = req.getPage() == null ? 1 : req.getPage();
+        long size = req.getSize() == null ? 10 : req.getSize();
+        return Response.ok(adminPlanService.list(req.getKeyword(), req.getGoal(), page, size));
     }
 
     /**

@@ -119,8 +119,9 @@ class AdminFoodControllerTest {
                 .andExpect(jsonPath("$.code").value(404))
                 .andExpect(jsonPath("$.message").value("食物不存在"));
 
-        mockMvc.perform(get("/api/admin/foods?size=1")
-                        .header("Authorization", "Bearer " + token))
+        mockMvc.perform(post("/api/admin/foods/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"size\":1}"))
                 .andExpect(jsonPath("$.data.records[0].name").value("待下架食物"))
                 .andExpect(jsonPath("$.data.records[0].status").value(0));
     }
@@ -148,8 +149,9 @@ class AdminFoodControllerTest {
                 .andExpect(status().isOk()).andReturn();
         String token = JsonPath.read(result.getResponse().getContentAsString(), "$.data.token");
 
-        mockMvc.perform(get("/api/admin/foods")
-                        .header("Authorization", "Bearer " + token))
+        mockMvc.perform(post("/api/admin/foods/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isForbidden());
     }
 }

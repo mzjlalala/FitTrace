@@ -59,8 +59,9 @@ class AdminUserControllerTest {
     @Test
     void list_returnsUsersWithoutPassword() throws Exception {
         String token = registerAndPromoteToAdmin();
-        mockMvc.perform(get("/api/admin/users")
-                        .header("Authorization", "Bearer " + token))
+        mockMvc.perform(post("/api/admin/users/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.records[0].username").isNotEmpty())
                 .andExpect(jsonPath("$.data.records[0].role").exists())
@@ -99,8 +100,9 @@ class AdminUserControllerTest {
     void disableSelf_returns409() throws Exception {
         String adminToken = registerAndPromoteToAdmin();
         // id 倒序，最新注册的自己排第一
-        MvcResult me = mockMvc.perform(get("/api/admin/users?size=1")
-                        .header("Authorization", "Bearer " + adminToken))
+        MvcResult me = mockMvc.perform(post("/api/admin/users/query")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"size\":1}"))
                 .andExpect(jsonPath("$.code").value(200)).andReturn();
         int myId = JsonPath.read(me.getResponse().getContentAsString(), "$.data.records[0].id");
 

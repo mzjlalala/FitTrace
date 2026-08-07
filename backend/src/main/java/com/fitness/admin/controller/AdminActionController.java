@@ -1,6 +1,7 @@
 package com.fitness.admin.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.fitness.admin.dto.AdminActionQueryRequest;
 import com.fitness.admin.dto.AdminActionRequest;
 import com.fitness.admin.service.AdminActionService;
 import com.fitness.admin.vo.AdminActionVO;
@@ -8,13 +9,11 @@ import com.fitness.common.api.Response;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -28,15 +27,13 @@ public class AdminActionController {
     private final AdminActionService adminActionService;
 
     /**
-     * 全量分页列表（含下架数据），支持名称关键字与分类筛选
+     * 全量分页列表（POST body 传参，含下架数据），支持名称关键字与分类筛选
      */
-    @GetMapping
-    public Response<IPage<AdminActionVO>> list(
-            @RequestParam(defaultValue = "1") long page,
-            @RequestParam(defaultValue = "10") long size,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Long categoryId) {
-        return Response.ok(adminActionService.list(keyword, categoryId, page, size));
+    @PostMapping("/query")
+    public Response<IPage<AdminActionVO>> list(@RequestBody AdminActionQueryRequest req) {
+        long page = req.getPage() == null ? 1 : req.getPage();
+        long size = req.getSize() == null ? 10 : req.getSize();
+        return Response.ok(adminActionService.list(req.getKeyword(), req.getCategoryId(), page, size));
     }
 
     /**

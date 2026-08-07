@@ -137,8 +137,9 @@ class AdminActionControllerTest {
                 .andExpect(jsonPath("$.code").value(404))
                 .andExpect(jsonPath("$.message").value("动作不存在"));
         // 管理列表仍可见且 status=0（id 倒序，新建的排在第一条）
-        mockMvc.perform(get("/api/admin/actions?size=1")
-                        .header("Authorization", "Bearer " + token))
+        mockMvc.perform(post("/api/admin/actions/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"size\":1}"))
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.records[0].name").value("待下架动作"))
                 .andExpect(jsonPath("$.data.records[0].status").value(0));
@@ -169,8 +170,9 @@ class AdminActionControllerTest {
     @Test
     void userToken_returnsHttp403() throws Exception {
         String token = registerUser();
-        mockMvc.perform(get("/api/admin/actions")
-                        .header("Authorization", "Bearer " + token))
+        mockMvc.perform(post("/api/admin/actions/query")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isForbidden());
         mockMvc.perform(post("/api/admin/actions")
                         .header("Authorization", "Bearer " + token)

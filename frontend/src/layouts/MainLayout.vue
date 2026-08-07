@@ -22,6 +22,13 @@ function onLogout() {
         <el-menu-item index="/training">训练记录</el-menu-item>
         <el-menu-item index="/diet">饮食记录</el-menu-item>
         <el-menu-item index="/profile">个人中心</el-menu-item>
+        <el-sub-menu v-if="auth.isAdmin" index="admin">
+          <template #title>管理后台</template>
+          <el-menu-item index="/admin/actions">动作管理</el-menu-item>
+          <el-menu-item index="/admin/plans">计划管理</el-menu-item>
+          <el-menu-item index="/admin/foods">食物管理</el-menu-item>
+          <el-menu-item index="/admin/users">用户管理</el-menu-item>
+        </el-sub-menu>
       </el-menu>
     </el-aside>
     <el-container>

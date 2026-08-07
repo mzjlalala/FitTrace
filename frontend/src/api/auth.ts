@@ -17,6 +17,7 @@ export interface UserInfo {
   nickname: string
   avatar: string | null
   phone: string | null
+  role: string
   gender: string | null
   birthDate: string | null
   heightCm: number | null

@@ -25,6 +25,8 @@ public class UserInfoVO {
     private String avatar;
     /** 手机号 */
     private String phone;
+    /** 角色（USER=普通用户/ADMIN=管理员） */
+    private String role;
     /** 性别（MALE=男 / FEMALE=女） */
     private String gender;
     /** 出生日期 */
@@ -47,6 +49,7 @@ public class UserInfoVO {
         vo.setNickname(user.getNickname());
         vo.setAvatar(user.getAvatar());
         vo.setPhone(user.getPhone());
+        vo.setRole(user.getRole());
         if (profile != null) {
             vo.setGender(profile.getGender());
             vo.setBirthDate(profile.getBirthDate());

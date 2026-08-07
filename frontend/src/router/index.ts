@@ -28,18 +28,35 @@ const router = createRouter({
         { path: 'training', name: 'training', component: () => import('@/views/TrainingView.vue') },
         { path: 'diet', name: 'diet', component: () => import('@/views/DietView.vue') },
         { path: 'profile', name: 'profile', component: () => import('@/views/ProfileView.vue') },
+        { path: 'admin/actions', name: 'admin-actions', meta: { admin: true }, component: () => import('@/views/admin/AdminActionsView.vue') },
+        { path: 'admin/plans', name: 'admin-plans', meta: { admin: true }, component: () => import('@/views/admin/AdminPlansView.vue') },
+        { path: 'admin/foods', name: 'admin-foods', meta: { admin: true }, component: () => import('@/views/admin/AdminFoodsView.vue') },
+        { path: 'admin/users', name: 'admin-users', meta: { admin: true }, component: () => import('@/views/admin/AdminUsersView.vue') },
       ],
     },
   ],
 })
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const auth = useAuthStore()
   if (!auth.isLoggedIn && to.name !== 'login' && to.name !== 'register') {
     return { name: 'login', query: { redirect: to.fullPath } }
   }
   if (auth.isLoggedIn && (to.name === 'login' || to.name === 'register')) {
     return { name: 'home' }
+  }
+  // 管理路由：刷新后 user 为空时先拉取资料，非管理员跳回首页
+  if (to.meta.admin) {
+    if (!auth.user) {
+      try {
+        await auth.fetchUser()
+      } catch {
+        return { name: 'login' }
+      }
+    }
+    if (!auth.isAdmin) {
+      return { name: 'home' }
+    }
   }
 })
 

@@ -82,6 +82,7 @@ export interface AdminFood {
   proteinPer100g: number
   fatPer100g: number
   carbPer100g: number
+  image: string | null
   status: number
 }
 
@@ -92,6 +93,7 @@ export interface AdminFoodInput {
   proteinPer100g: number
   fatPer100g: number
   carbPer100g: number
+  image: string | null
   status: number
 }
 

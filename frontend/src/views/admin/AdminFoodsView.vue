@@ -8,6 +8,8 @@ import {
   apiAdminUpdateFood,
   type AdminFood,
 } from '@/api/admin'
+import { apiUploadImage } from '@/api/oss'
+import type { UploadRequestOptions } from 'element-plus'
 
 const records = ref<AdminFood[]>([])
 const total = ref(0)
@@ -30,8 +32,20 @@ const form = reactive({
   proteinPer100g: 0 as number | null,
   fatPer100g: 0 as number | null,
   carbPer100g: 0 as number | null,
+  image: '',
   status: 1,
 })
+
+/** 上传食物图片到 OSS，成功后将 URL 写入表单 */
+async function uploadImage(file: File) {
+  if (file.size > 5 * 1024 * 1024) {
+    ElMessage.warning('图片大小不能超过 5MB')
+    return
+  }
+  const res = await apiUploadImage(file)
+  form.image = res.data
+  ElMessage.success('图片上传成功')
+}
 
 async function load() {
   loading.value = true
@@ -58,6 +72,7 @@ function openCreate() {
     proteinPer100g: 0,
     fatPer100g: 0,
     carbPer100g: 0,
+    image: '',
     status: 1,
   })
   dialogVisible.value = true
@@ -72,6 +87,7 @@ function openEdit(row: AdminFood) {
     proteinPer100g: row.proteinPer100g,
     fatPer100g: row.fatPer100g,
     carbPer100g: row.carbPer100g,
+    image: row.image ?? '',
     status: row.status,
   })
   dialogVisible.value = true
@@ -95,6 +111,7 @@ async function submit() {
       proteinPer100g: form.proteinPer100g ?? 0,
       fatPer100g: form.fatPer100g ?? 0,
       carbPer100g: form.carbPer100g ?? 0,
+      image: form.image || null,
       status: form.status,
     }
     if (editingId.value) {
@@ -149,6 +166,12 @@ onMounted(load)
 
     <el-table v-loading="loading" :data="records">
       <el-table-column prop="id" label="ID" width="70" />
+      <el-table-column label="图片" width="80">
+        <template #default="{ row }">
+          <img v-if="row.image" :src="row.image" class="food-thumb" alt="" />
+          <span v-else class="thumb-empty">—</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="name" label="名称" min-width="140" />
       <el-table-column prop="category" label="分类" width="90" />
       <el-table-column label="热量/100g" width="100">
@@ -195,6 +218,18 @@ onMounted(load)
             <el-option v-for="c in CATEGORIES" :key="c" :label="c" :value="c" />
           </el-select>
         </el-form-item>
+        <el-form-item label="图片">
+          <el-upload
+            :show-file-list="false"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            :http-request="(options: UploadRequestOptions) => uploadImage(options.file)"
+          >
+            <div class="image-uploader">
+              <img v-if="form.image" :src="form.image" class="image-preview" alt="食物图片" />
+              <span v-else class="image-placeholder">点击上传图片</span>
+            </div>
+          </el-upload>
+        </el-form-item>
         <el-form-item label="热量(每100g)" required>
           <el-input-number v-model="form.caloriesPer100g" :min="0" :max="1000" :precision="1" />
           <span class="unit"> kcal</span>
@@ -237,5 +272,36 @@ onMounted(load)
 .unit {
   margin-left: 8px;
   color: #909399;
+}
+.food-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+.thumb-empty {
+  color: #c0c4cc;
+}
+.image-uploader {
+  cursor: pointer;
+}
+.image-preview {
+  width: 96px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 72px;
+  border: 1px dashed #c0c4cc;
+  border-radius: 4px;
+  background: #fafafa;
+  color: #909399;
+  font-size: 13px;
 }
 </style>

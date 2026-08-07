@@ -8,6 +8,7 @@ export interface DietFood {
   proteinPer100g: number
   fatPer100g: number
   carbPer100g: number
+  image: string | null
 }
 
 export interface DietRecord {

@@ -165,7 +165,17 @@ onMounted(() => {
           :remote-method="onSearchFood"
           :loading="false"
         >
-          <el-option v-for="f in foodOptions" :key="f.id" :label="`${f.name}（${f.caloriesPer100g} kcal/100g）`" :value="f.id" />
+          <el-option
+            v-for="f in foodOptions"
+            :key="f.id"
+            :label="`${f.name}（${f.caloriesPer100g} kcal/100g）`"
+            :value="f.id"
+          >
+            <div class="food-option">
+              <img v-if="f.image" :src="f.image" class="food-option-thumb" alt="" />
+              <span>{{ f.name }}（{{ f.caloriesPer100g }} kcal/100g）</span>
+            </div>
+          </el-option>
         </el-select>
         <el-input-number v-model="quantityG" :min="1" :max="5000" />
         <span class="unit">克</span>
@@ -249,6 +259,17 @@ onMounted(() => {
 }
 .unit {
   color: #909399;
+}
+.food-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.food-option-thumb {
+  width: 24px;
+  height: 24px;
+  object-fit: cover;
+  border-radius: 3px;
 }
 .week-card {
   margin-top: 16px;

@@ -7,8 +7,10 @@ import { CalendarComponent, TooltipComponent, VisualMapComponent } from 'echarts
 import { CanvasRenderer } from 'echarts/renderers'
 import type { ECharts } from 'echarts/core'
 import { apiGetProfile, apiUpdateProfile } from '@/api/auth'
+import { apiUploadImage } from '@/api/oss'
 import { apiGetStatsHeatmap, apiGetStatsSummary, type HeatmapDay, type TrainingSummary } from '@/api/training'
 import { useAuthStore } from '@/stores/auth'
+import type { UploadRequestOptions } from 'element-plus'
 
 echarts.use([HeatmapChart, CalendarComponent, TooltipComponent, VisualMapComponent, CanvasRenderer])
 
@@ -24,6 +26,7 @@ let chart: ECharts | null = null
 
 const form = reactive({
   nickname: '',
+  avatar: '',
   gender: '',
   birthDate: '',
   heightCm: null as number | null,
@@ -32,6 +35,17 @@ const form = reactive({
   fitnessLevel: '',
   weeklyFrequency: null as number | null,
 })
+
+/** 上传头像到 OSS，成功后将 URL 写入表单（点「保存」后生效） */
+async function uploadAvatar(file: File) {
+  if (file.size > 5 * 1024 * 1024) {
+    ElMessage.warning('图片大小不能超过 5MB')
+    return
+  }
+  const res = await apiUploadImage(file)
+  form.avatar = res.data
+  ElMessage.success('头像上传成功，点击保存后生效')
+}
 
 const rules: FormRules = {
   heightCm: [{ type: 'number', min: 50, max: 250, message: '身高 50-250cm', trigger: 'blur' }],
@@ -125,6 +139,18 @@ async function onSave() {
     <h2>个人中心</h2>
     <el-card v-loading="loading">
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
+        <el-form-item label="头像">
+          <el-upload
+            :show-file-list="false"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            :http-request="(options: UploadRequestOptions) => uploadAvatar(options.file)"
+          >
+            <el-avatar :size="72" :src="form.avatar || undefined" class="avatar-uploader">
+              {{ (form.nickname || auth.user?.username || 'U').charAt(0) }}
+            </el-avatar>
+          </el-upload>
+          <span class="avatar-tip">点击头像上传（jpg/png/webp/gif，≤5MB）</span>
+        </el-form-item>
         <el-form-item label="用户名">
           <el-input :model-value="auth.user?.username" disabled />
         </el-form-item>
@@ -245,5 +271,15 @@ async function onSave() {
 .heatmap {
   width: 100%;
   height: 220px;
+}
+.avatar-uploader {
+  cursor: pointer;
+  font-size: 28px;
+  background: #409eff;
+}
+.avatar-tip {
+  margin-left: 12px;
+  color: #909399;
+  font-size: 13px;
 }
 </style>

@@ -32,7 +32,7 @@
 - 认证：`Authorization: Bearer <token>`；业务错误 HTTP 200 + 业务 code；未认证 HTTP 401
 - 主要接口见 docs/健身网站开发路线图.md 第 6 节
 
-## 已实现接口（M4 里程碑）
+## 已实现接口（M5 里程碑）
 
 | 分组 | 接口 | 说明 |
 |---|---|---|
@@ -52,6 +52,12 @@
 | 饮食 | GET `/api/diet/foods`、`/api/diet/foods/{id}` | 食物库分页/关键字/分类筛选与详情（每 100g 营养） |
 | 饮食 | POST/GET `/api/diet/records`、PUT/DELETE `/api/diet/records/{id}` | 饮食记录 CRUD（按日期查看） |
 | 饮食 | GET `/api/diet/records/summary` | 每日营养汇总（日期范围，无记录天为 0） |
+| 管理后台 | GET/POST/PUT/DELETE `/api/admin/actions` | 动作全量管理（含下架，CRUD + 上下架） |
+| 管理后台 | GET/POST/PUT/DELETE `/api/admin/plans` | 计划管理（周/日/动作树整体提交，被训练记录引用时拒绝编辑） |
+| 管理后台 | GET/POST/PUT/DELETE `/api/admin/foods` | 食物全量管理（CRUD + 上下架） |
+| 管理后台 | GET `/api/admin/users`、PUT `/api/admin/users/{id}/status` | 用户列表 / 禁用启用（不能禁用自己） |
+
+> 管理后台接口仅 **ADMIN 角色** 可访问（其他角色 HTTP 403）。内置管理员账号：**admin / 123456**（Flyway V6 种子，注册用户默认为 USER）。
 
 ### 统计口径（P4 前已统一）
 
@@ -69,4 +75,5 @@
 | M2 | P2 动作库 + P3 训练计划 | ✅ 完成（30 动作 / 4 计划模板种子数据） |
 | M3 | P4 训练记录 + P5 基础数据 | ✅ 完成（86 个后端测试 + 9 个前端测试全绿） |
 | M4 | P6 饮食管理 | ✅ 完成（107 个后端测试 + 12 个前端测试全绿，28 种食物种子） |
-| M5 | P7 联调上线 | 待实施 |
+| M5 | P7 管理后台 | ✅ 完成（133 个后端测试 + 15 个前端测试全绿，ADMIN/USER 角色体系） |
+| M6 | P8 联调上线 | 待实施 |

@@ -20,6 +20,7 @@ function mockUser(overrides: Partial<UserInfo>): UserInfo {
     nickname: 'Alice',
     avatar: null,
     phone: null,
+    role: 'USER',
     gender: null,
     birthDate: null,
     heightCm: null,

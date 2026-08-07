@@ -15,6 +15,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TrainingRecordDetailVO extends TrainingRecordVO {
 
+    /** 组数据（按组序号升序） */
     private List<TrainingSetVO> sets;
 
     public static TrainingRecordDetailVO of(TrainingRecord record, String planName) {

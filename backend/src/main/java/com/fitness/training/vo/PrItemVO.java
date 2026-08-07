@@ -14,10 +14,15 @@ import java.time.LocalDate;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PrItemVO {
 
+    /** 动作 ID */
     private Long actionId;
+    /** 动作名称 */
     private String actionName;
+    /** 最佳组重量（kg） */
     private BigDecimal weightKg;
+    /** 最佳组完成次数 */
     private Integer reps;
+    /** 创造纪录的日期 */
     private LocalDate recordDate;
 
     public static PrItemVO of(TrainingRecordSetMapper.PrRow row, String actionName) {

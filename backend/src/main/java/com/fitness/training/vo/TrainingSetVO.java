@@ -13,12 +13,19 @@ import java.math.BigDecimal;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TrainingSetVO {
 
+    /** 组数据 ID */
     private Long id;
+    /** 动作 ID */
     private Long actionId;
+    /** 动作名称 */
     private String actionName;
+    /** 组序号（从 1 递增） */
     private Integer setNo;
+    /** 重量（kg，徒手/有氧可为空） */
     private BigDecimal weightKg;
+    /** 完成次数 */
     private Integer reps;
+    /** 是否完成（TRUE=完成；PR 统计仅计入完成的组） */
     private Boolean doneFlag;
 
     public static TrainingSetVO of(TrainingRecordSet set, String actionName) {

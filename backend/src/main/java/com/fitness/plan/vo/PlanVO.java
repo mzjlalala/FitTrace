@@ -4,17 +4,28 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fitness.plan.entity.Plan;
 import lombok.Data;
 
+/**
+ * 计划概要
+ */
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PlanVO {
 
+    /** 计划 ID */
     private Long id;
+    /** 计划名称 */
     private String name;
+    /** 训练目标（LOSE_FAT/MUSCLE_GAIN/KEEP_FIT/STRENGTH） */
     private String goal;
+    /** 难度水平（BEGINNER/INTERMEDIATE/ADVANCED） */
     private String level;
+    /** 计划总周数 */
     private Integer durationWeeks;
+    /** 每周训练频次 */
     private Integer frequencyPerWeek;
+    /** 计划描述 */
     private String description;
+    /** 封面图 URL */
     private String coverImage;
 
     public static PlanVO of(Plan plan) {

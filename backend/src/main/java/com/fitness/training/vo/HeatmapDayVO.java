@@ -12,6 +12,8 @@ import java.time.LocalDate;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class HeatmapDayVO {
 
+    /** 日期 */
     private LocalDate date;
+    /** 当天训练记录条数 */
     private Long count;
 }

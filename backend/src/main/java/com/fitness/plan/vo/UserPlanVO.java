@@ -14,12 +14,19 @@ import java.time.LocalDate;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserPlanVO {
 
+    /** 订阅记录 ID */
     private Long id;
+    /** 计划 ID */
     private Long planId;
+    /** 计划名称 */
     private String planName;
+    /** 计划目标（LOSE_FAT/MUSCLE_GAIN/KEEP_FIT/STRENGTH） */
     private String planGoal;
+    /** 计划水平（BEGINNER/INTERMEDIATE/ADVANCED） */
     private String planLevel;
+    /** 开始日期 */
     private LocalDate startDate;
+    /** 状态（ACTIVE=进行中/COMPLETED=已完成/QUIT=已退出） */
     private String status;
 
     public static UserPlanVO of(UserPlan up, Plan plan) {

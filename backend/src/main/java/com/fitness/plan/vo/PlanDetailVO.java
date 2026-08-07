@@ -15,6 +15,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PlanDetailVO extends PlanVO {
 
+    /** 周安排（MVP 为单周循环，长度 1） */
     private List<PlanWeekVO> weeks;
 
     public static PlanDetailVO of(Plan plan) {

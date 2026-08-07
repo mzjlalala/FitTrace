@@ -15,9 +15,13 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ActionDetailVO extends ActionListItemVO {
 
+    /** 教学视频 URL */
     private String videoUrl;
+    /** 动作步骤（按顺序执行） */
     private List<String> steps;
+    /** 训练技巧 */
     private List<String> tips;
+    /** 注意事项/安全提醒 */
     private List<String> cautions;
 
     public static ActionDetailVO of(Action action, String categoryName) {

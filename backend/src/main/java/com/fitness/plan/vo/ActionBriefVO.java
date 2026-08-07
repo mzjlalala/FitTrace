@@ -11,10 +11,15 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ActionBriefVO {
 
+    /** 动作 ID */
     private Long id;
+    /** 动作名称 */
     private String name;
+    /** 目标肌群 */
     private String muscleGroup;
+    /** 难度（BEGINNER/INTERMEDIATE/ADVANCED） */
     private String difficulty;
+    /** 所需器械 */
     private String equipment;
 
     public static ActionBriefVO of(Action action) {

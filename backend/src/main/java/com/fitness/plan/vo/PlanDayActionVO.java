@@ -11,12 +11,19 @@ import lombok.Data;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PlanDayActionVO {
 
+    /** 编排 ID */
     private Long id;
+    /** 当日执行顺序 */
     private Integer sort;
+    /** 目标组数 */
     private Integer sets;
+    /** 目标每组次数 */
     private Integer reps;
+    /** 重量模式（FIXED=固定重量 / 递增） */
     private String weightMode;
+    /** 组间休息（秒） */
     private Integer restSeconds;
+    /** 动作概要（名称/肌群/难度/器械） */
     private ActionBriefVO action;
 
     public static PlanDayActionVO of(PlanDayAction pda, ActionBriefVO action) {

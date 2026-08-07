@@ -31,3 +31,26 @@
 - 统一前缀 `/api`；统一返回体 `{ code, message, data }`
 - 认证：`Authorization: Bearer <token>`；业务错误 HTTP 200 + 业务 code；未认证 HTTP 401
 - 主要接口见 docs/健身网站开发路线图.md 第 6 节
+
+## 已实现接口（M2 里程碑）
+
+| 分组 | 接口 | 说明 |
+|---|---|---|
+| 认证 | POST `/api/auth/register` `/api/auth/login` `/api/auth/logout` | 注册/登录/登出 |
+| 用户 | GET/PUT `/api/user/profile` | 个人信息与身体数据 |
+| 动作库 | GET `/api/actions/categories` | 动作分类 |
+| 动作库 | GET `/api/actions` | 分页/筛选（categoryId/muscleGroup/difficulty/keyword） |
+| 动作库 | GET `/api/actions/{id}` | 动作详情（步骤/技巧/注意事项） |
+| 计划 | GET `/api/plans` | 计划列表（goal/level 筛选） |
+| 计划 | GET `/api/plans/recommend` | 按用户资料规则推荐 |
+| 计划 | GET `/api/plans/{id}` | 计划详情（周/日/动作树） |
+| 订阅 | POST/GET `/api/user-plans`、PUT `/api/user-plans/{id}` | 开始/我的/更新状态 |
+
+## 里程碑进度
+
+| 里程碑 | 内容 | 状态 |
+|---|---|---|
+| M1 | P0 脚手架 + P1 用户体系 | ✅ 完成（63 个后端测试全绿） |
+| M2 | P2 动作库 + P3 训练计划 | ✅ 完成（30 动作 / 4 计划模板种子数据） |
+| M3 | P4 训练记录 + P5 基础数据 | 待实施 |
+| M4 | P6 联调上线 | 待实施 |

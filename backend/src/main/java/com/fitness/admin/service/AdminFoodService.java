@@ -32,7 +32,7 @@ public class AdminFoodService {
         dietFoodMapper.selectPage(p, Wrappers.<DietFood>lambdaQuery()
                 .like(keyword != null && !keyword.isBlank(), DietFood::getName, keyword)
                 .eq(category != null && !category.isBlank(), DietFood::getCategory, category)
-                .orderByDesc(DietFood::getId));
+                .orderByAsc(DietFood::getId));
         Page<AdminFoodVO> result = new Page<>(p.getCurrent(), p.getSize(), p.getTotal());
         result.setRecords(p.getRecords().stream().map(AdminFoodVO::of).toList());
         return result;

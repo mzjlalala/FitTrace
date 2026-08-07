@@ -36,12 +36,12 @@ jwt:
   expire-seconds: 86400
 oss:
   # 是否启用阿里云 OSS（填入下方配置后改为 true）
-  enabled: false
+  enabled: true
   # 地域节点，如 oss-cn-hangzhou.aliyuncs.com（与 bucket 同地域）
-  endpoint: ""
-  access-key-id: ""
-  access-key-secret: ""
+  endpoint: "oss-cn-shenzhen.aliyuncs.com"
+  access-key-id: "LTAI5t9cV4ZkyNxfmcd9RkRu"
+  access-key-secret: "4bbne4fqCC434GgwFQWaloNuVKeKWw"
   # Bucket 名称
-  bucket: ""
+  bucket: "work-system-mason"
   # 图片访问 URL 前缀，如 https://fit-images.oss-cn-hangzhou.aliyuncs.com
-  url-prefix: ""
+  url-prefix: "https://work-system-mason.oss-cn-shenzhen.aliyuncs.com"

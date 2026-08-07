@@ -38,7 +38,7 @@ public class AdminActionService {
         actionMapper.selectPage(p, Wrappers.<Action>lambdaQuery()
                 .like(keyword != null && !keyword.isBlank(), Action::getName, keyword)
                 .eq(categoryId != null, Action::getCategoryId, categoryId)
-                .orderByDesc(Action::getId));
+                .orderByAsc(Action::getId));
 
         List<Long> categoryIds = p.getRecords().stream()
                 .map(Action::getCategoryId).filter(Objects::nonNull).distinct().toList();

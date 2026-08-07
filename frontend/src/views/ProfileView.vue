@@ -1,13 +1,26 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import * as echarts from 'echarts/core'
+import { HeatmapChart } from 'echarts/charts'
+import { CalendarComponent, TooltipComponent, VisualMapComponent } from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
+import type { ECharts } from 'echarts/core'
 import { apiGetProfile, apiUpdateProfile } from '@/api/auth'
+import { apiGetStatsHeatmap, apiGetStatsSummary, type HeatmapDay, type TrainingSummary } from '@/api/training'
 import { useAuthStore } from '@/stores/auth'
+
+echarts.use([HeatmapChart, CalendarComponent, TooltipComponent, VisualMapComponent, CanvasRenderer])
 
 const auth = useAuthStore()
 const formRef = ref<FormInstance>()
 const loading = ref(false)
 const saving = ref(false)
+
+const summary = ref<TrainingSummary | null>(null)
+const heatmap = ref<HeatmapDay[]>([])
+const heatmapRef = ref<HTMLDivElement>()
+let chart: ECharts | null = null
 
 const form = reactive({
   nickname: '',
@@ -25,6 +38,54 @@ const rules: FormRules = {
   weightKg: [{ type: 'number', min: 20, max: 300, message: '体重 20-300kg', trigger: 'blur' }],
 }
 
+async function loadStats() {
+  const [s, h] = await Promise.all([apiGetStatsSummary(), apiGetStatsHeatmap()])
+  summary.value = s.data
+  heatmap.value = h.data
+}
+
+function renderHeatmap() {
+  if (!heatmapRef.value || heatmap.value.length === 0) return
+  chart = echarts.init(heatmapRef.value)
+  chart.setOption({
+    tooltip: {},
+    visualMap: {
+      min: 0,
+      max: 4,
+      calculable: false,
+      orient: 'horizontal',
+      left: 'center',
+      bottom: 0,
+      inRange: { color: ['#ebedf0', '#c6e48b', '#7bc96f', '#239a3b', '#196127'] },
+    },
+    calendar: {
+      range: [heatmap.value[0]?.date ?? '', heatmap.value[heatmap.value.length - 1]?.date ?? ''],
+      top: 40,
+      left: 40,
+      right: 20,
+      cellSize: ['auto', 14],
+      itemStyle: { borderWidth: 0.5, borderColor: '#fff' },
+      splitLine: { show: false },
+      yearLabel: { show: true },
+      monthLabel: { show: true },
+      dayLabel: { show: false },
+    },
+    series: [
+      {
+        type: 'heatmap',
+        coordinateSystem: 'calendar',
+        data: heatmap.value.map((d) => [d.date, d.count]),
+        emphasis: { itemStyle: { borderColor: '#333', borderWidth: 1 } },
+      },
+    ],
+  })
+  window.addEventListener('resize', onResize)
+}
+
+function onResize() {
+  chart?.resize()
+}
+
 onMounted(async () => {
   loading.value = true
   try {
@@ -34,6 +95,14 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+  await loadStats()
+  await nextTick()
+  renderHeatmap()
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', onResize)
+  chart?.dispose()
 })
 
 async function onSave() {
@@ -100,11 +169,81 @@ async function onSave() {
         </el-form-item>
       </el-form>
     </el-card>
+
+    <el-card v-if="summary" class="stats-card">
+      <template #header>训练统计</template>
+      <el-row :gutter="16">
+        <el-col :span="6">
+          <div class="stat-item">
+            <div class="stat-value">{{ summary.totalCount }}</div>
+            <div class="stat-label">总训练次数</div>
+          </div>
+        </el-col>
+        <el-col :span="6">
+          <div class="stat-item">
+            <div class="stat-value">{{ (summary.totalMinutes / 60).toFixed(1) }}</div>
+            <div class="stat-label">总时长（小时）</div>
+          </div>
+        </el-col>
+        <el-col :span="6">
+          <div class="stat-item">
+            <div class="stat-value">{{ summary.checkInDays }}</div>
+            <div class="stat-label">打卡天数</div>
+          </div>
+        </el-col>
+        <el-col :span="6">
+          <div class="stat-item">
+            <div class="stat-value">{{ summary.streakDays }}</div>
+            <div class="stat-label">连续打卡（天）</div>
+          </div>
+        </el-col>
+      </el-row>
+    </el-card>
+
+    <el-card v-if="summary && summary.prList.length > 0" class="stats-card">
+      <template #header>个人纪录（PR）</template>
+      <el-table :data="summary.prList" size="small">
+        <el-table-column prop="actionName" label="动作" min-width="160" />
+        <el-table-column label="重量" width="110">
+          <template #default="{ row }">{{ row.weightKg }} kg</template>
+        </el-table-column>
+        <el-table-column label="次数" width="80">
+          <template #default="{ row }">{{ row.reps ?? '—' }}</template>
+        </el-table-column>
+        <el-table-column prop="recordDate" label="日期" width="120" />
+      </el-table>
+    </el-card>
+
+    <el-card v-if="heatmap.length > 0" class="stats-card">
+      <template #header>训练热力图（近 365 天）</template>
+      <div ref="heatmapRef" class="heatmap"></div>
+    </el-card>
   </div>
 </template>
 
 <style scoped>
 .profile-page {
-  max-width: 640px;
+  max-width: 900px;
+}
+.stats-card {
+  margin-top: 16px;
+}
+.stat-item {
+  text-align: center;
+  padding: 8px 0;
+}
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #409eff;
+}
+.stat-label {
+  margin-top: 4px;
+  color: #909399;
+  font-size: 13px;
+}
+.heatmap {
+  width: 100%;
+  height: 220px;
 }
 </style>

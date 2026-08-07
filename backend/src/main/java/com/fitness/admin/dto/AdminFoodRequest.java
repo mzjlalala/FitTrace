@@ -47,6 +47,10 @@ public class AdminFoodRequest {
     @DecimalMax(value = "100.0", message = "碳水范围 0-100")
     private BigDecimal carbPer100g;
 
+    /** 图片 URL（OSS 上传后返回的地址） */
+    @Size(max = 255, message = "图片地址最长 255 字")
+    private String image;
+
     /** 状态（1=上架，0=下架） */
     @Min(value = 0, message = "状态只能是 0 或 1")
     @Max(value = 1, message = "状态只能是 0 或 1")

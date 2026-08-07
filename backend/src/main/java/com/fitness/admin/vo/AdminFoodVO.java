@@ -20,6 +20,7 @@ public class AdminFoodVO {
     private BigDecimal proteinPer100g;
     private BigDecimal fatPer100g;
     private BigDecimal carbPer100g;
+    private String image;
     private Integer status;
 
     public static AdminFoodVO of(DietFood food) {
@@ -31,6 +32,7 @@ public class AdminFoodVO {
         vo.setProteinPer100g(food.getProteinPer100g());
         vo.setFatPer100g(food.getFatPer100g());
         vo.setCarbPer100g(food.getCarbPer100g());
+        vo.setImage(food.getImage());
         vo.setStatus(food.getStatus());
         return vo;
     }

@@ -34,6 +34,8 @@ public class DietFood {
     /** 每 100g 碳水化合物（g） */
     @TableField("carb_per_100g")
     private BigDecimal carbPer100g;
+    /** 图片 URL（OSS 上传） */
+    private String image;
     /** 状态（1=上架，0=下架） */
     private Integer status;
 }

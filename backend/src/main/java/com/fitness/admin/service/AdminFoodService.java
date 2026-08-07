@@ -86,6 +86,7 @@ public class AdminFoodService {
         food.setProteinPer100g(req.getProteinPer100g() == null ? BigDecimal.ZERO : req.getProteinPer100g());
         food.setFatPer100g(req.getFatPer100g() == null ? BigDecimal.ZERO : req.getFatPer100g());
         food.setCarbPer100g(req.getCarbPer100g() == null ? BigDecimal.ZERO : req.getCarbPer100g());
+        food.setImage(req.getImage());
         food.setStatus(req.getStatus());
     }
 }

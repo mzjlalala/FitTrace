@@ -55,7 +55,9 @@ class AdminFoodControllerTest {
 
     private String foodBody(String name, int status) {
         return "{\"name\":\"" + name + "\",\"category\":\"测试类\",\"caloriesPer100g\":50.5,"
-                + "\"proteinPer100g\":10,\"fatPer100g\":1.5,\"carbPer100g\":2,\"status\":" + status + "}";
+                + "\"proteinPer100g\":10,\"fatPer100g\":1.5,\"carbPer100g\":2,"
+                + "\"image\":\"https://fit-test.oss-cn-hangzhou.aliyuncs.com/fitness/20260807/x.png\","
+                + "\"status\":" + status + "}";
     }
 
     @Test
@@ -67,13 +69,15 @@ class AdminFoodControllerTest {
                         .content(foodBody("魔芋", 1)))
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.caloriesPer100g").value(50.5))
+                .andExpect(jsonPath("$.data.image").value("https://fit-test.oss-cn-hangzhou.aliyuncs.com/fitness/20260807/x.png"))
                 .andReturn();
         int foodId = JsonPath.read(created.getResponse().getContentAsString(), "$.data.id");
 
         mockMvc.perform(get("/api/diet/foods/" + foodId)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.name").value("魔芋"));
+                .andExpect(jsonPath("$.data.name").value("魔芋"))
+                .andExpect(jsonPath("$.data.image").value("https://fit-test.oss-cn-hangzhou.aliyuncs.com/fitness/20260807/x.png"));
     }
 
     @Test

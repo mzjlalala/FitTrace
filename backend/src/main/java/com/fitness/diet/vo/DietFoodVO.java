@@ -27,6 +27,8 @@ public class DietFoodVO {
     private BigDecimal fatPer100g;
     /** 每 100g 碳水化合物（g） */
     private BigDecimal carbPer100g;
+    /** 图片 URL（OSS 上传） */
+    private String image;
 
     public static DietFoodVO of(DietFood food) {
         DietFoodVO vo = new DietFoodVO();
@@ -37,6 +39,7 @@ public class DietFoodVO {
         vo.setProteinPer100g(food.getProteinPer100g());
         vo.setFatPer100g(food.getFatPer100g());
         vo.setCarbPer100g(food.getCarbPer100g());
+        vo.setImage(food.getImage());
         return vo;
     }
 }

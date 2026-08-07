@@ -42,6 +42,6 @@ oss:
   access-key-id: "LTAI5t9cV4ZkyNxfmcd9RkRu"
   access-key-secret: "4bbne4fqCC434GgwFQWaloNuVKeKWw"
   # Bucket 名称
-  bucket: "work-system-mason"
+  bucket: "fit-trace"
   # 图片访问 URL 前缀，如 https://fit-images.oss-cn-hangzhou.aliyuncs.com
-  url-prefix: "https://work-system-mason.oss-cn-shenzhen.aliyuncs.com"
+  url-prefix: "https://fit-trace.oss-cn-shenzhen.aliyuncs.com"

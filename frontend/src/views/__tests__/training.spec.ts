@@ -15,6 +15,7 @@ vi.mock('@/api/training', () => ({
 
 vi.mock('@/api/action', () => ({
   apiListActions: vi.fn(),
+  MUSCLE_LABEL: { CHEST: '胸部', BACK: '背部', LEGS: '腿部', SHOULDERS: '肩部', BICEPS: '二头', TRICEPS: '三头', CORE: '核心', CARDIO: '有氧' },
 }))
 
 function mockRecord(): TrainingRecordVO {
@@ -54,8 +55,30 @@ beforeEach(() => {
           coverImage: null,
           description: null,
         },
+        {
+          id: 2,
+          categoryId: 2,
+          categoryName: '背部',
+          name: '高位下拉',
+          muscleGroup: 'BACK',
+          difficulty: 'INTERMEDIATE',
+          equipment: '绳索',
+          coverImage: null,
+          description: null,
+        },
+        {
+          id: 3,
+          categoryId: 3,
+          categoryName: '手臂',
+          name: '哑铃弯举',
+          muscleGroup: 'BICEPS',
+          difficulty: 'BEGINNER',
+          equipment: '哑铃',
+          coverImage: null,
+          description: null,
+        },
       ],
-      total: 1,
+      total: 3,
       size: 100,
       current: 1,
     },
@@ -84,6 +107,41 @@ describe('TrainingView', () => {
     expect(wrapper.text()).toContain('记录训练')
     expect(wrapper.text()).toContain('训练组')
     expect(wrapper.text()).toContain('保存')
+
+    wrapper.unmount()
+  })
+
+  it('filters action options by muscle group in create dialog', async () => {
+    const wrapper = mount(TrainingView, { global: { plugins: [ElementPlus] }, attachTo: document.body })
+    await flushPromises()
+    await wrapper.findAll('button').find((b) => b.text().includes('记录训练'))!.trigger('click')
+    await flushPromises()
+
+    // 弹窗内的肌群筛选下拉（弹窗内第 2 个 el-select：感受、肌群筛选、动作…）
+    await wrapper.findAll('.el-select')[1]!.find('.el-select__wrapper').trigger('click')
+    await flushPromises()
+    const backOption = Array.from(document.querySelectorAll('.el-select-dropdown__item')).find(
+      (el) => el.textContent?.trim() === '背部',
+    ) as HTMLElement
+    expect(backOption).toBeTruthy()
+    backOption.click()
+    await flushPromises()
+
+    // 选择「背部」肌群后，动作下拉只展示背部动作 + 已选动作（第一行默认选中了第一个动作）
+    await wrapper.findAll('.el-select')[2]!.find('.el-select__wrapper').trigger('click')
+    await flushPromises()
+    // 只统计当前展开（可见）的下拉，避免匹配到已收起/残留的下拉
+    const options = Array.from(
+      document.querySelectorAll('.el-select-dropdown:not([style*="display: none"]) .el-select-dropdown__item'),
+    ).map((el) => el.textContent?.trim())
+    expect(options).toContain('高位下拉')
+    // 筛选生效：其他肌群的动作不在选项中
+    expect(options).not.toContain('哑铃弯举')
+    // 已选动作保留，切换肌群不丢失当前行选择
+    expect(options).toContain('杠铃卧推')
+
+    wrapper.unmount()
+    document.body.innerHTML = ''
   })
 
   it('shows empty state when no records', async () => {

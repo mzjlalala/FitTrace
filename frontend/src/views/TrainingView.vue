@@ -11,7 +11,7 @@ import {
   type TrainingRecordVO,
   type TrainingSetInput,
 } from '@/api/training'
-import { apiListActions, type ActionListItem } from '@/api/action'
+import { apiListActions, MUSCLE_LABEL, type ActionListItem } from '@/api/action'
 
 const records = ref<TrainingRecordVO[]>([])
 const total = ref(0)
@@ -26,6 +26,20 @@ const editingId = ref<number | null>(null)
 const detail = ref<TrainingRecordDetail | null>(null)
 
 const actionOptions = ref<ActionListItem[]>([])
+const activeMuscle = ref<string | undefined>(undefined)
+
+/**
+ * 弹窗内动作下拉的可选项：按肌群过滤；已选动作始终保留，
+ * 避免切换肌群筛选后当前行已选动作在下拉中消失
+ */
+const visibleActions = computed(() => {
+  const filtered = activeMuscle.value
+    ? actionOptions.value.filter((a) => a.muscleGroup === activeMuscle.value)
+    : actionOptions.value
+  const selectedIds = new Set(form.setRows.map((r) => r.actionId).filter((id): id is number => !!id))
+  const extra = actionOptions.value.filter((a) => selectedIds.has(a.id) && !filtered.some((f) => f.id === a.id))
+  return filtered.concat(extra)
+})
 
 const FEEL_LABEL: Record<string, string> = {
   GOOD: '状态好',
@@ -232,11 +246,22 @@ onMounted(async () => {
         </el-form-item>
 
         <el-form-item label="训练组">
+          <div class="set-toolbar">
+            <el-select
+              v-model="activeMuscle"
+              clearable
+              placeholder="按肌群筛选动作"
+              style="width: 200px"
+              @clear="activeMuscle = undefined"
+            >
+              <el-option v-for="(label, value) in MUSCLE_LABEL" :key="value" :label="label" :value="value" />
+            </el-select>
+          </div>
           <el-table :data="form.setRows" size="small">
             <el-table-column label="动作" min-width="200">
               <template #default="{ row }">
                 <el-select v-model="row.actionId" filterable placeholder="选择动作">
-                  <el-option v-for="a in actionOptions" :key="a.id" :label="a.name" :value="a.id" />
+                  <el-option v-for="a in visibleActions" :key="a.id" :label="a.name" :value="a.id" />
                 </el-select>
               </template>
             </el-table-column>
@@ -312,6 +337,10 @@ onMounted(async () => {
 .pager {
   margin-top: 16px;
   justify-content: flex-end;
+}
+.set-toolbar {
+  width: 100%;
+  margin-bottom: 8px;
 }
 .add-set {
   margin-top: 8px;

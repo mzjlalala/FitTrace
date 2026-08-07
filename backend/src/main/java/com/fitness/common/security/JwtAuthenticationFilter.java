@@ -39,9 +39,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 } else {
                     request.setAttribute("jwt-claims", claims);
                     Long userId = Long.valueOf(claims.getSubject());
+                    // 旧 token 无 role claim 时按普通用户处理（兼容已登录用户）
+                    String role = "ADMIN".equals(claims.get("role", String.class)) ? "ADMIN" : "USER";
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
-                                    userId, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+                                    userId, null, List.of(new SimpleGrantedAuthority("ROLE_" + role)));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } catch (JwtException | NumberFormatException ignored) {

@@ -50,7 +50,7 @@ class SecurityFilterTest {
 
     @Test
     void validToken_passesSecurity_returns404Code() throws Exception {
-        String token = jwtUtil.generateToken(1L, "tester");
+        String token = jwtUtil.generateToken(1L, "tester", "USER");
         mockMvc.perform(get(PROTECTED_PROBE).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(404));
@@ -58,7 +58,7 @@ class SecurityFilterTest {
 
     @Test
     void blacklistedToken_returns401() throws Exception {
-        String token = jwtUtil.generateToken(1L, "tester");
+        String token = jwtUtil.generateToken(1L, "tester", "USER");
         Claims claims = jwtUtil.parseToken(token);
         String redisKey = "auth:blacklist:" + claims.getId();
         try {

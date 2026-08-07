@@ -29,12 +29,13 @@ public class JwtUtil {
         return Encoders.BASE64.encode(key.getEncoded());
     }
 
-    public String generateToken(Long userId, String username) {
+    public String generateToken(Long userId, String username, String role) {
         Date now = new Date();
         return Jwts.builder()
                 .id(UUID.randomUUID().toString())
                 .subject(String.valueOf(userId))
                 .claim("username", username)
+                .claim("role", role)
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + expireSeconds * 1000))
                 .signWith(key)

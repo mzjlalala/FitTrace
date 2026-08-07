@@ -49,6 +49,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(req.getPassword()));
         user.setNickname(req.getNickname() == null || req.getNickname().isBlank()
                 ? req.getUsername() : req.getNickname());
+        user.setRole("USER");
         user.setStatus(1);
         try {
             sysUserMapper.insert(user);
@@ -75,7 +76,7 @@ public class AuthService {
         if (user.getStatus() != null && user.getStatus() != 1) {
             throw new BizException(ResultCode.FORBIDDEN, "账号已被禁用");
         }
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
         return new LoginResponse(token, user);
     }
 

@@ -31,6 +31,8 @@ public class SysUser {
     private String avatar;
     /** 手机号 */
     private String phone;
+    /** 角色（USER=普通用户/ADMIN=管理员） */
+    private String role;
     /** 状态（1=正常，0=禁用） */
     private Integer status;
     /** 创建时间（自动填充） */

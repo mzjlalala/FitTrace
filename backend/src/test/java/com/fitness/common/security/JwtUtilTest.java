@@ -23,7 +23,7 @@ class JwtUtilTest {
 
     @Test
     void generateAndParse_roundTrip() {
-        String token = jwtUtil.generateToken(42L, "alice");
+        String token = jwtUtil.generateToken(42L, "alice", "USER");
         Claims claims = jwtUtil.parseToken(token);
         assertThat(claims.getSubject()).isEqualTo("42");
         assertThat(claims.get("username", String.class)).isEqualTo("alice");
@@ -33,7 +33,7 @@ class JwtUtilTest {
     @Test
     void expiredToken_throwsExpiredJwtException() {
         JwtUtil shortLived = new JwtUtil(jwtUtil.getSecret(), -10);
-        String token = shortLived.generateToken(1L, "x");
+        String token = shortLived.generateToken(1L, "x", "USER");
         assertThatThrownBy(() -> shortLived.parseToken(token))
                 .isInstanceOf(ExpiredJwtException.class);
     }
@@ -41,16 +41,16 @@ class JwtUtilTest {
     @Test
     void tamperedPayload_throwsJwtException() {
         // 篡改 payload 段（真实篡改场景）必须被签名校验拦截
-        String token = jwtUtil.generateToken(1L, "x");
+        String token = jwtUtil.generateToken(1L, "x", "USER");
         String[] parts = token.split("\\.");
-        String tampered = parts[0] + "." + parts[1].replace('a', 'b') + "." + parts[2];
+        String tampered = parts[0] + "." + parts[1] + "x" + "." + parts[2];
         assertThatThrownBy(() -> jwtUtil.parseToken(tampered))
                 .isInstanceOf(JwtException.class);
     }
 
     @Test
     void remainingSeconds_isPositive() {
-        String token = jwtUtil.generateToken(1L, "x");
+        String token = jwtUtil.generateToken(1L, "x", "USER");
         assertThat(jwtUtil.getRemainingSeconds(jwtUtil.parseToken(token))).isPositive();
     }
 }

@@ -28,6 +28,16 @@ const DIFFICULTY_LABEL: Record<string, string> = {
   ADVANCED: '高级',
 }
 
+const MUSCLE_LABEL: Record<string, string> = {
+  CHEST: '胸部',
+  BACK: '背部',
+  LEGS: '腿部',
+  SHOULDERS: '肩部',
+  ARMS: '手臂',
+  CORE: '核心',
+  CARDIO: '有氧',
+}
+
 interface StepRow {
   key: number
   text: string
@@ -182,7 +192,9 @@ onMounted(async () => {
       <el-table-column prop="id" label="ID" width="70" />
       <el-table-column prop="name" label="名称" min-width="160" />
       <el-table-column prop="categoryName" label="分类" width="90" />
-      <el-table-column prop="muscleGroup" label="肌群" width="90" />
+      <el-table-column label="肌群" width="90">
+        <template #default="{ row }">{{ MUSCLE_LABEL[row.muscleGroup] || row.muscleGroup || '—' }}</template>
+      </el-table-column>
       <el-table-column label="难度" width="90">
         <template #default="{ row }">{{ DIFFICULTY_LABEL[row.difficulty] || row.difficulty }}</template>
       </el-table-column>
@@ -229,13 +241,7 @@ onMounted(async () => {
           <el-col :span="12">
             <el-form-item label="肌群">
               <el-select v-model="form.muscleGroup" clearable placeholder="选择肌群">
-                <el-option label="胸部" value="CHEST" />
-                <el-option label="背部" value="BACK" />
-                <el-option label="腿部" value="LEGS" />
-                <el-option label="肩部" value="SHOULDERS" />
-                <el-option label="手臂" value="ARMS" />
-                <el-option label="核心" value="CORE" />
-                <el-option label="有氧" value="CARDIO" />
+                <el-option v-for="(label, value) in MUSCLE_LABEL" :key="value" :label="label" :value="value" />
               </el-select>
             </el-form-item>
           </el-col>

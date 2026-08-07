@@ -30,6 +30,7 @@ onMounted(async () => {
       <template #content>动作详情</template>
     </el-page-header>
     <template v-if="detail">
+      <img v-if="detail.coverImage" :src="detail.coverImage" class="detail-cover" alt="封面图" />
       <h2>{{ detail.name }}</h2>
       <div class="tags">
         <el-tag>{{ detail.categoryName }}</el-tag>
@@ -85,5 +86,12 @@ onMounted(async () => {
 .steps li {
   margin-bottom: 8px;
   line-height: 1.6;
+}
+.detail-cover {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 12px;
 }
 </style>

@@ -121,6 +121,10 @@ onMounted(() => {
             style="margin-bottom: 16px"
           >
             <el-card shadow="hover" class="action-card" @click="goDetail(a.id)">
+              <div class="cover">
+                <img v-if="a.coverImage" :src="a.coverImage" class="cover-img" alt="" />
+                <div v-else class="cover-placeholder">{{ a.name.charAt(0) }}</div>
+              </div>
               <h3>{{ a.name }}</h3>
               <p class="desc">{{ a.description }}</p>
               <div class="tags">
@@ -166,6 +170,27 @@ onMounted(() => {
 }
 .action-card {
   cursor: pointer;
+}
+.cover {
+  margin-bottom: 10px;
+}
+.cover-img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.cover-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 120px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #e8f1ff, #f0f2f5);
+  color: #409eff;
+  font-size: 36px;
+  font-weight: 600;
 }
 .action-card h3 {
   margin: 0 0 8px;

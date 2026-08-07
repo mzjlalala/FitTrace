@@ -9,6 +9,8 @@ import {
   type AdminAction,
 } from '@/api/admin'
 import { apiGetCategories, MUSCLE_LABEL, type ActionCategory } from '@/api/action'
+import { apiUploadImage } from '@/api/oss'
+import type { UploadRequestOptions } from 'element-plus'
 
 const records = ref<AdminAction[]>([])
 const total = ref(0)
@@ -40,6 +42,7 @@ const form = reactive({
   muscleGroup: '',
   difficulty: 'BEGINNER',
   equipment: '',
+  coverImage: '',
   description: '',
   steps: [] as StepRow[],
   tips: [] as StepRow[],
@@ -66,6 +69,7 @@ function openCreate() {
     muscleGroup: '',
     difficulty: 'BEGINNER',
     equipment: '',
+    coverImage: '',
     description: '',
     steps: [],
     tips: [],
@@ -86,6 +90,7 @@ function openEdit(row: AdminAction) {
     muscleGroup: row.muscleGroup ?? '',
     difficulty: row.difficulty ?? 'BEGINNER',
     equipment: row.equipment ?? '',
+    coverImage: row.coverImage ?? '',
     description: row.description ?? '',
     steps: (row.steps ?? []).map((t) => ({ key: ++stepKey, text: t })),
     tips: (row.tips ?? []).map((t) => ({ key: ++stepKey, text: t })),
@@ -93,6 +98,17 @@ function openEdit(row: AdminAction) {
     status: row.status,
   })
   dialogVisible.value = true
+}
+
+/** 上传封面图到 OSS，成功后将 URL 写入表单 */
+async function uploadCover(file: File) {
+  if (file.size > 5 * 1024 * 1024) {
+    ElMessage.warning('图片大小不能超过 5MB')
+    return
+  }
+  const res = await apiUploadImage(file)
+  form.coverImage = res.data
+  ElMessage.success('封面图上传成功')
 }
 
 function addStep(list: StepRow[]) {
@@ -116,7 +132,7 @@ async function submit() {
       muscleGroup: form.muscleGroup || null,
       difficulty: form.difficulty || null,
       equipment: form.equipment || null,
-      coverImage: null,
+      coverImage: form.coverImage || null,
       videoUrl: null,
       description: form.description || null,
       steps: texts(form.steps),
@@ -254,6 +270,18 @@ onMounted(async () => {
             </el-form-item>
           </el-col>
         </el-row>
+        <el-form-item label="封面图">
+          <el-upload
+            :show-file-list="false"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            :http-request="(options: UploadRequestOptions) => uploadCover(options.file)"
+          >
+            <div class="cover-uploader">
+              <img v-if="form.coverImage" :src="form.coverImage" class="cover-preview" alt="封面图" />
+              <span v-else class="cover-placeholder">点击上传封面图</span>
+            </div>
+          </el-upload>
+        </el-form-item>
         <el-form-item label="简介">
           <el-input v-model="form.description" type="textarea" :rows="2" />
         </el-form-item>
@@ -308,5 +336,26 @@ onMounted(async () => {
   gap: 8px;
   margin-bottom: 8px;
   width: 100%;
+}
+.cover-uploader {
+  cursor: pointer;
+}
+.cover-preview {
+  width: 200px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.cover-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+  height: 120px;
+  border: 1px dashed #c0c4cc;
+  border-radius: 4px;
+  background: #fafafa;
+  color: #909399;
+  font-size: 13px;
 }
 </style>

@@ -62,6 +62,25 @@ describe('ActionsView', () => {
     expect(mockedList).toHaveBeenCalledTimes(1)
   })
 
+  it('renders cover image when present', async () => {
+    mockedList.mockResolvedValue({
+      code: 200,
+      message: 'ok',
+      data: {
+        records: [{ ...mockItem(1, '杠铃卧推'), coverImage: 'https://fit-test.oss-cn-hangzhou.aliyuncs.com/fitness/20260807/a.png' }],
+        total: 1,
+        size: 10,
+        current: 1,
+      },
+    })
+    const wrapper = mount(ActionsView, { global: { plugins: [ElementPlus] } })
+    await flushPromises()
+
+    expect(wrapper.find('img.cover-img').attributes('src')).toBe(
+      'https://fit-test.oss-cn-hangzhou.aliyuncs.com/fitness/20260807/a.png',
+    )
+  })
+
   it('search triggers reload with keyword', async () => {
     const wrapper = mount(ActionsView, { global: { plugins: [ElementPlus] } })
     await flushPromises()

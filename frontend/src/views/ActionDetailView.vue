@@ -88,10 +88,11 @@ onMounted(async () => {
   line-height: 1.6;
 }
 .detail-cover {
+  display: block;
   width: 100%;
-  max-height: 320px;
-  object-fit: cover;
+  max-width: 640px;
+  height: auto;
+  margin: 0 auto 16px;
   border-radius: 8px;
-  margin-bottom: 12px;
 }
 </style>

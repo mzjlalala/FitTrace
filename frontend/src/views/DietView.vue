@@ -242,11 +242,11 @@ onMounted(() => {
 .stat-value {
   font-size: 26px;
   font-weight: 700;
-  color: #e6a23c;
+  color: var(--el-color-warning);
 }
 .stat-label {
   margin-top: 4px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
   font-size: 13px;
 }
 .add-card {
@@ -258,7 +258,7 @@ onMounted(() => {
   gap: 12px;
 }
 .unit {
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 .food-option {
   display: flex;
@@ -282,13 +282,13 @@ onMounted(() => {
 }
 .week-date {
   width: 100px;
-  color: #606266;
+  color: var(--el-text-color-regular);
   font-size: 13px;
 }
 .week-value {
   width: 80px;
   text-align: right;
-  color: #606266;
+  color: var(--el-text-color-regular);
   font-size: 13px;
 }
 </style>

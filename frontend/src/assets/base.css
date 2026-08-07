@@ -47,6 +47,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ========== 暗色主题（html.dark，配合 Element Plus dark css-vars） ========== */
+html.dark {
+  --bg: #14161a;
+  --brand-soft: #10231c;
+  --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --text-1: #e5e7eb;
+  --text-2: #9ca3af;
+}
+
 a {
   text-decoration: none;
 }
@@ -60,7 +69,7 @@ a {
 /* 卡片：圆角 + 轻阴影 */
 .el-card {
   border-radius: 12px;
-  border: 1px solid #eef1f0;
+  border: 1px solid var(--el-border-color-light);
   box-shadow: var(--card-shadow);
 }
 .el-card.is-always-shadow,

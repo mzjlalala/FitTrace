@@ -152,12 +152,12 @@ async function onSubmit() {
   margin: 0;
   font-size: 24px;
   font-weight: 700;
-  color: #0d9467;
+  color: var(--brand);
 }
 .subtitle {
   margin: 2px 0 0;
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-2);
 }
 .submit {
   width: 100%;
@@ -167,6 +167,6 @@ async function onSubmit() {
   margin-top: 16px;
   text-align: center;
   font-size: 13px;
-  color: #6b7280;
+  color: var(--text-2);
 }
 </style>

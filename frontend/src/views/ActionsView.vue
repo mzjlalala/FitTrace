@@ -187,8 +187,8 @@ onMounted(() => {
   width: 100%;
   height: 120px;
   border-radius: 4px;
-  background: linear-gradient(135deg, #e8f1ff, #f0f2f5);
-  color: #409eff;
+  background: linear-gradient(135deg, var(--el-fill-color-light), var(--el-fill-color));
+  color: var(--el-color-primary);
   font-size: 36px;
   font-weight: 600;
 }
@@ -196,7 +196,7 @@ onMounted(() => {
   margin: 0 0 8px;
 }
 .desc {
-  color: #909399;
+  color: var(--el-text-color-secondary);
   font-size: 13px;
   height: 36px;
   overflow: hidden;

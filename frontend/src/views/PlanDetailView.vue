@@ -139,7 +139,7 @@ onMounted(loadPlan)
   margin-bottom: 8px;
 }
 .desc {
-  color: #606266;
+  color: var(--el-text-color-regular);
 }
 .day-header {
   display: flex;
@@ -150,10 +150,10 @@ onMounted(loadPlan)
   font-weight: 600;
 }
 .rest-day {
-  background: #f5f7fa;
+  background: var(--el-fill-color-light);
 }
 .rest-text {
-  color: #909399;
+  color: var(--el-text-color-secondary);
   text-align: center;
   padding: 12px 0;
 }

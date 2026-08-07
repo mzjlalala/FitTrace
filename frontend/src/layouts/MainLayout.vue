@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useThemeStore } from '@/stores/theme'
 
 const router = useRouter()
 const auth = useAuthStore()
+const theme = useThemeStore()
 
 function onLogout() {
   // logout 同步清理本地 token，之后立即跳转（守卫不再拦截）
@@ -39,6 +41,9 @@ function onLogout() {
       <el-header class="header">
         <span class="slogan">健身教练 + 记录工具</span>
         <div class="header-right">
+          <el-button link class="theme-btn" :title="theme.dark ? '切换到亮色' : '切换到暗色'" @click="theme.toggle()">
+            {{ theme.dark ? '☀️' : '🌙' }}
+          </el-button>
           <el-avatar v-if="auth.user?.avatar" :src="auth.user.avatar" :size="28" />
           <el-avatar v-else :size="28" class="avatar-fallback">
             {{ (auth.user?.nickname || auth.user?.username || 'U').charAt(0) }}
@@ -59,8 +64,8 @@ function onLogout() {
   height: 100vh;
 }
 .aside {
-  background: #fff;
-  border-right: 1px solid #eef1f0;
+  background: var(--el-bg-color);
+  border-right: 1px solid var(--el-border-color-light);
 }
 .logo {
   height: 60px;
@@ -91,8 +96,8 @@ function onLogout() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #fff;
-  border-bottom: 1px solid #eef1f0;
+  background: var(--el-bg-color);
+  border-bottom: 1px solid var(--el-border-color-light);
   box-shadow: 0 1px 6px rgba(16, 185, 129, 0.06);
 }
 .header-right {
@@ -100,8 +105,12 @@ function onLogout() {
   align-items: center;
   gap: 10px;
 }
+.theme-btn {
+  font-size: 16px;
+  padding: 0 4px;
+}
 .nickname {
-  color: #606266;
+  color: var(--el-text-color-regular);
   font-size: 14px;
 }
 .avatar-fallback {

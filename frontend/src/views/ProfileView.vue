@@ -261,11 +261,11 @@ async function onSave() {
 .stat-value {
   font-size: 28px;
   font-weight: 700;
-  color: #409eff;
+  color: var(--el-color-primary);
 }
 .stat-label {
   margin-top: 4px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
   font-size: 13px;
 }
 .heatmap {
@@ -275,11 +275,11 @@ async function onSave() {
 .avatar-uploader {
   cursor: pointer;
   font-size: 28px;
-  background: #409eff;
+  background: var(--el-color-primary);
 }
 .avatar-tip {
   margin-left: 12px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
   font-size: 13px;
 }
 </style>

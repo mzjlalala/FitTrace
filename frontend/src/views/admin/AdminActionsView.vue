@@ -352,10 +352,10 @@ onMounted(async () => {
   justify-content: center;
   width: 200px;
   height: 120px;
-  border: 1px dashed #c0c4cc;
+  border: 1px dashed var(--el-border-color);
   border-radius: 4px;
-  background: #fafafa;
-  color: #909399;
+  background: var(--el-fill-color-light);
+  color: var(--el-text-color-secondary);
   font-size: 13px;
 }
 </style>

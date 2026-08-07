@@ -271,7 +271,7 @@ onMounted(load)
 }
 .unit {
   margin-left: 8px;
-  color: #909399;
+  color: var(--el-text-color-secondary);
 }
 .food-thumb {
   width: 48px;
@@ -281,7 +281,7 @@ onMounted(load)
   display: block;
 }
 .thumb-empty {
-  color: #c0c4cc;
+  color: var(--el-text-color-placeholder);
 }
 .image-uploader {
   cursor: pointer;
@@ -298,10 +298,10 @@ onMounted(load)
   justify-content: center;
   width: 96px;
   height: 72px;
-  border: 1px dashed #c0c4cc;
+  border: 1px dashed var(--el-border-color);
   border-radius: 4px;
-  background: #fafafa;
-  color: #909399;
+  background: var(--el-fill-color-light);
+  color: var(--el-text-color-secondary);
   font-size: 13px;
 }
 </style>

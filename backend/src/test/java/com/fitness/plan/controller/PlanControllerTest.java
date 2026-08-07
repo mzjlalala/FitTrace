@@ -123,4 +123,51 @@ class PlanControllerTest {
         List<String> names = JsonPath.read(result.getResponse().getContentAsString(), "$.data[*].name");
         assertThat(names).containsExactly("新手全身增肌", "减脂燃脂", "力量进阶", "肌肉雕刻进阶");
     }
+
+    @Test
+    void detail_returnsWeekDayActionTree() throws Exception {
+        String username = genUsername();
+        registerAndGetUserId(username);
+        String token = loginAndGetToken(username);
+
+        MvcResult listResult = mockMvc.perform(get("/api/plans").param("goal", "STRENGTH")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk()).andReturn();
+        int planId = ((List<Integer>) JsonPath.read(listResult.getResponse().getContentAsString(),
+                "$.data[*].id")).get(0);
+
+        mockMvc.perform(get("/api/plans/" + planId)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.name").value("力量进阶"))
+                .andExpect(jsonPath("$.data.durationWeeks").value(6))
+                .andExpect(jsonPath("$.data.weeks.length()").value(1))
+                .andExpect(jsonPath("$.data.weeks[0].weekNo").value(1))
+                .andExpect(jsonPath("$.data.weeks[0].days.length()").value(5))
+                .andExpect(jsonPath("$.data.weeks[0].days[0].title").value("推日"))
+                .andExpect(jsonPath("$.data.weeks[0].days[0].restFlag").value(false))
+                .andExpect(jsonPath("$.data.weeks[0].days[0].actions.length()").value(5))
+                .andExpect(jsonPath("$.data.weeks[0].days[0].actions[0].action.name").value("杠铃卧推"))
+                .andExpect(jsonPath("$.data.weeks[0].days[0].actions[0].sets").value(5))
+                .andExpect(jsonPath("$.data.weeks[0].days[0].actions[0].reps").value(5))
+                .andExpect(jsonPath("$.data.weeks[0].days[0].actions[0].restSeconds").value(120))
+                .andExpect(jsonPath("$.data.weeks[0].days[1].title").value("拉日"))
+                .andExpect(jsonPath("$.data.weeks[0].days[1].actions.length()").value(4))
+                .andExpect(jsonPath("$.data.weeks[0].days[1].actions[0].action.name").value("引体向上"))
+                .andExpect(jsonPath("$.data.weeks[0].days[2].restFlag").value(true))
+                .andExpect(jsonPath("$.data.weeks[0].days[2].title").doesNotExist())
+                .andExpect(jsonPath("$.data.weeks[0].days[2].actions").isEmpty());
+    }
+
+    @Test
+    void detail_notFound_returns404Code() throws Exception {
+        String username = genUsername();
+        registerAndGetUserId(username);
+        mockMvc.perform(get("/api/plans/999999")
+                        .header("Authorization", "Bearer " + loginAndGetToken(username)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(404))
+                .andExpect(jsonPath("$.message").value("计划不存在"));
+    }
 }

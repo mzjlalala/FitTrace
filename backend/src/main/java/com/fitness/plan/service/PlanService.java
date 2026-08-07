@@ -1,11 +1,24 @@
 package com.fitness.plan.service;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.fitness.action.entity.Action;
+import com.fitness.action.mapper.ActionMapper;
 import com.fitness.common.api.ResultCode;
 import com.fitness.common.exception.BizException;
 import com.fitness.plan.entity.Plan;
+import com.fitness.plan.entity.PlanDay;
+import com.fitness.plan.entity.PlanDayAction;
+import com.fitness.plan.entity.PlanWeek;
+import com.fitness.plan.mapper.PlanDayActionMapper;
+import com.fitness.plan.mapper.PlanDayMapper;
 import com.fitness.plan.mapper.PlanMapper;
+import com.fitness.plan.mapper.PlanWeekMapper;
+import com.fitness.plan.vo.ActionBriefVO;
+import com.fitness.plan.vo.PlanDayActionVO;
+import com.fitness.plan.vo.PlanDayVO;
+import com.fitness.plan.vo.PlanDetailVO;
 import com.fitness.plan.vo.PlanVO;
+import com.fitness.plan.vo.PlanWeekVO;
 import com.fitness.system.entity.UserProfile;
 import com.fitness.system.mapper.UserProfileMapper;
 import lombok.RequiredArgsConstructor;
@@ -13,12 +26,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class PlanService {
 
     private final PlanMapper planMapper;
+    private final PlanWeekMapper planWeekMapper;
+    private final PlanDayMapper planDayMapper;
+    private final PlanDayActionMapper planDayActionMapper;
+    private final ActionMapper actionMapper;
     private final UserProfileMapper userProfileMapper;
 
     public List<PlanVO> listPlans(String goal, String level) {
@@ -51,6 +70,56 @@ public class PlanService {
             throw new BizException(ResultCode.NOT_FOUND, "计划不存在");
         }
         return plan;
+    }
+
+    /**
+     * 计划详情：plan → weeks → days → actions，逐层 in 批查后在内存组装。
+     */
+    public PlanDetailVO getPlanDetail(Long id) {
+        Plan plan = requirePlan(id);
+        PlanDetailVO vo = PlanDetailVO.of(plan);
+
+        List<PlanWeek> weeks = planWeekMapper.selectList(Wrappers.<PlanWeek>lambdaQuery()
+                .eq(PlanWeek::getPlanId, id).orderByAsc(PlanWeek::getWeekNo));
+        List<Long> weekIds = weeks.stream().map(PlanWeek::getId).toList();
+        if (weekIds.isEmpty()) {
+            vo.setWeeks(List.of());
+            return vo;
+        }
+
+        List<PlanDay> days = planDayMapper.selectList(Wrappers.<PlanDay>lambdaQuery()
+                .in(PlanDay::getPlanWeekId, weekIds).orderByAsc(PlanDay::getDayNo));
+        Map<Long, List<PlanDay>> daysByWeek = days.stream()
+                .collect(Collectors.groupingBy(PlanDay::getPlanWeekId));
+
+        List<Long> dayIds = days.stream().map(PlanDay::getId).toList();
+        List<PlanDayAction> pdas = dayIds.isEmpty() ? List.of() : planDayActionMapper.selectList(
+                Wrappers.<PlanDayAction>lambdaQuery()
+                        .in(PlanDayAction::getPlanDayId, dayIds).orderByAsc(PlanDayAction::getSort));
+        Map<Long, List<PlanDayAction>> pdasByDay = pdas.stream()
+                .collect(Collectors.groupingBy(PlanDayAction::getPlanDayId));
+
+        List<Long> actionIds = pdas.stream().map(PlanDayAction::getActionId).distinct().toList();
+        Map<Long, Action> actionsById = actionIds.isEmpty() ? Map.of()
+                : actionMapper.selectBatchIds(actionIds).stream()
+                        .collect(Collectors.toMap(Action::getId, a -> a));
+
+        List<PlanWeekVO> weekVOs = weeks.stream().map(w -> {
+            PlanWeekVO wv = PlanWeekVO.of(w);
+            List<PlanDayVO> dayVOs = daysByWeek.getOrDefault(w.getId(), List.of()).stream().map(d -> {
+                PlanDayVO dv = PlanDayVO.of(d);
+                List<PlanDayActionVO> actionVOs = pdasByDay.getOrDefault(d.getId(), List.of()).stream()
+                        .map(pda -> PlanDayActionVO.of(pda,
+                                ActionBriefVO.of(actionsById.get(pda.getActionId()))))
+                        .toList();
+                dv.setActions(actionVOs);
+                return dv;
+            }).toList();
+            wv.setDays(dayVOs);
+            return wv;
+        }).toList();
+        vo.setWeeks(weekVOs);
+        return vo;
     }
 
     private int score(UserProfile profile, Plan plan) {

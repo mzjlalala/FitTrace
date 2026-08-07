@@ -43,6 +43,7 @@ function mockFood(): AdminFood {
     proteinPer100g: 10,
     fatPer100g: 1.5,
     carbPer100g: 2,
+    image: null,
     status: 1,
   }
 }

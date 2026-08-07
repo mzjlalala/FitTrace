@@ -65,7 +65,7 @@ describe('DietView', () => {
       code: 200,
       message: 'ok',
       data: {
-        records: [{ id: 1, name: '米饭', category: '主食', caloriesPer100g: 116, proteinPer100g: 2.6, fatPer100g: 0.3, carbPer100g: 25.9 }],
+        records: [{ id: 1, name: '米饭', category: '主食', caloriesPer100g: 116, proteinPer100g: 2.6, fatPer100g: 0.3, carbPer100g: 25.9, image: null }],
         total: 1,
         size: 20,
         current: 1,

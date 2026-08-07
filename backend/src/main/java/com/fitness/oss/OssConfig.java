@@ -1,8 +1,10 @@
 package com.fitness.oss;
 
+import cn.hutool.core.util.StrUtil;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +20,7 @@ import java.util.List;
 @Configuration
 @EnableConfigurationProperties(OssProperties.class)
 @RequiredArgsConstructor
+@Slf4j
 public class OssConfig {
 
     /**
@@ -28,21 +31,19 @@ public class OssConfig {
     @ConditionalOnProperty(prefix = "oss", name = "enabled", havingValue = "true")
     public OSS ossClient(OssProperties props) {
         List<String> missing = new ArrayList<>();
-        if (isBlank(props.getEndpoint())) missing.add("endpoint");
-        if (isBlank(props.getAccessKeyId())) missing.add("access-key-id");
-        if (isBlank(props.getAccessKeySecret())) missing.add("access-key-secret");
-        if (isBlank(props.getBucket())) missing.add("bucket");
-        if (isBlank(props.getUrlPrefix())) missing.add("url-prefix");
+        if (StrUtil.isBlank(props.getEndpoint())) missing.add("endpoint");
+        if (StrUtil.isBlank(props.getAccessKeyId())) missing.add("access-key-id");
+        if (StrUtil.isBlank(props.getAccessKeySecret())) missing.add("access-key-secret");
+        if (StrUtil.isBlank(props.getBucket())) missing.add("bucket");
+        if (StrUtil.isBlank(props.getUrlPrefix())) missing.add("url-prefix");
         if (!missing.isEmpty()) {
             throw new IllegalStateException(
                     "OSS 配置缺失，请完善 application.yml 的 oss." + String.join(", oss.", missing)
                             + "（或先保持 oss.enabled=false）");
         }
+        log.info("OSS 初始化成功 {}", props.getBucket());
         return new OSSClientBuilder()
                 .build(props.getEndpoint(), props.getAccessKeyId(), props.getAccessKeySecret());
     }
 
-    private boolean isBlank(String s) {
-        return s == null || s.isBlank();
-    }
 }
